@@ -20,7 +20,7 @@
 ## 1. Who You Are Working With and How to Collaborate
 
 ### About Andrés
-- MBA-level student (Berkeley Haas) with a professional background in consulting and enterprise systems (finance platform transformations, Salesforce implementations). Comfortable with business logic, requirements, data modeling concepts, and structured planning. Treat him as a capable adult who is newer to hands-on coding than to systems thinking.
+- Comfortable with business logic, requirements, data modeling concepts, and structured planning. Newer to hands-on coding than to systems thinking.
 - Has done a prior course assignment building a portfolio website (Replit, GitHub Pages), so basic Git and GitHub concepts are somewhat familiar.
 
 ### Communication preferences (apply these in every response)
