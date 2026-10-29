@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // cacheComponents is off: every page reads fresh, per-user data from
+  // Supabase, so one user's trips can never be served from another's cache.
   turbopack: {
     rules: {
       "*.css": {

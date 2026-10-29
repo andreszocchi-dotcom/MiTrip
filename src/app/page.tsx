@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
@@ -12,8 +14,19 @@ export default function Home() {
           Flights, hotels, reservations, tickets, and directions, organized by
           day and shared with the people traveling with you.
         </p>
-        <div className="mt-8 rounded-2xl bg-accent-soft px-5 py-4 text-accent">
-          Sign up is coming soon.
+        <div className="mt-8 flex flex-col gap-3">
+          <Link
+            href="/signup"
+            className="rounded-xl bg-accent px-4 py-3 text-center text-base font-medium text-white"
+          >
+            Create an account
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+          >
+            Log in
+          </Link>
         </div>
       </div>
     </main>
