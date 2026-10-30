@@ -4,8 +4,9 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { themeOf } from "@/lib/themes";
-import { DeleteTripButton } from "./delete-trip-button";
+import { deleteTrip } from "../actions";
 
 export const metadata: Metadata = { title: "Trip · MiTrip" };
 
@@ -80,19 +81,21 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         {trip.days.map((day, index) => {
           const planCount = day.plans[0]?.count ?? 0;
           return (
-            <li
-              key={day.id}
-              className="flex items-center justify-between rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-black/5"
-            >
-              <div>
-                <p className="font-medium">
-                  Day {index + 1} · {formatDay(day.date)}
-                </p>
-                {day.greeting && <p className="text-sm text-muted">{day.greeting}</p>}
-              </div>
-              <span className="text-sm text-muted">
-                {planCount} {planCount === 1 ? "plan" : "plans"}
-              </span>
+            <li key={day.id}>
+              <Link
+                href={`/trips/${trip.id}/days/${day.id}`}
+                className="flex items-center justify-between rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99]"
+              >
+                <div>
+                  <p className="font-medium">
+                    Day {index + 1} · {formatDay(day.date)}
+                  </p>
+                  {day.greeting && <p className="text-sm text-muted">{day.greeting}</p>}
+                </div>
+                <span className="text-sm text-muted">
+                  {planCount} {planCount === 1 ? "plan" : "plans"} ›
+                </span>
+              </Link>
             </li>
           );
         })}
@@ -106,7 +109,11 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
           >
             Edit trip
           </Link>
-          <DeleteTripButton tripId={trip.id} tripName={trip.name} />
+          <ConfirmDeleteButton
+            action={deleteTrip.bind(null, trip.id)}
+            label="Delete trip"
+            warning={`This deletes “${trip.name}” and every day and plan in it. This can’t be undone.`}
+          />
         </div>
       )}
     </main>

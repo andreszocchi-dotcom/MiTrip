@@ -28,3 +28,10 @@ export function formatDay(isoDate: string) {
 export function countDays(start: string, end: string) {
   return Math.round((toDate(end).getTime() - toDate(start).getTime()) / 86_400_000) + 1;
 }
+
+// "20:00:00" -> "8:00 PM"
+export function formatTime(time: string) {
+  const [h, m] = time.split(":").map(Number);
+  const suffix = h < 12 ? "AM" : "PM";
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${suffix}`;
+}
