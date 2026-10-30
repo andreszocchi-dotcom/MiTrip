@@ -48,4 +48,4 @@ A browser test on a throwaway account with a short sample itinerary I didn't wri
 
 **Second run** ($0.0013, 11.7 seconds): every day had a greeting ("Honeymoon adventure starts today!", "Time flies over the Pacific.", "Congrats, you landed in Sydney!", "Sun, sand, and ferry rides ahead!"). Day 3 read in real order: land 6 AM, check in, The Rocks, Opera House 3:30 PM, dinner 7:30 PM. Every place had a Google Maps search link. The plans test (15 checks) still passed.
 
-**What I checked / decided:** _(fill in after importing my real honeymoon itinerary: is Haiku good enough, or switch to Sonnet?)_
+**What I checked / decided:** Imported my real honeymoon itinerary on the live site: 62 plans across the trip, every one with a description, 61 with an address, 18 with a time. My verdict: "i think haiku did a fine job!" **Keeping Claude Haiku 5.5.** It didn't find many specific Google Maps points, which I think is mostly because my itinerary was light on specifics; where I named a place (like Brown's Boutique Hotel) it pointed to that exact spot. Next time I can add more place names to the itinerary.
