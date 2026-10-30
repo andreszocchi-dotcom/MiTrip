@@ -4,13 +4,13 @@ MiTrip keeps every plan for a trip (flights, hotels, reservations, tickets, acti
 
 Built by Andrés Zocchi as a solo app for Intro to Coding (Solo Demo Day, Nov 4, 2026).
 
-- **Live app:** coming soon (deployed on Vercel)
+- **Live app:** https://mi-trip-kappa.vercel.app
 - **Plan:** [PLAN.md](PLAN.md)
 - **Original sketches:** [sketches/](sketches/)
 
 ## Status
 
-Scaffold only: a blank landing page. Features ship one pull request at a time, in the order listed in [PLAN.md](PLAN.md).
+Sign up, log in, and log out work. Features ship one pull request at a time, in the order listed in [PLAN.md](PLAN.md).
 
 ## Tools
 
@@ -20,16 +20,31 @@ Scaffold only: a blank landing page. Features ship one pull request at a time, i
 | Next.js 16 (React, TypeScript) | The web app |
 | Tailwind CSS 4 | Styling |
 | Vercel | Hosting, redeploys on every merge to main |
-| Supabase | Database, sign up and login, file storage (coming in later features) |
+| Supabase | Database (Postgres with Row Level Security), sign up and login, file storage |
 
 ## Run it on your computer
 
-You need [Node.js](https://nodejs.org) 20 or newer.
+You need [Node.js](https://nodejs.org) 20 or newer and a Supabase project.
 
 ```bash
 git clone https://github.com/andreszocchi-dotcom/MiTrip.git
 cd MiTrip
 npm install
+```
+
+Create a file named `.env.local` in the project folder with your Supabase project's URL and publishable key (Supabase dashboard, then Connect):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+```
+
+Set up the database tables (from `supabase/migrations/`) and start the app:
+
+```bash
+npx supabase login
+npx supabase link --project-ref your-project-ref
+npx supabase db push
 npm run dev
 ```
 
