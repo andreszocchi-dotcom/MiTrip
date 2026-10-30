@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -59,6 +60,21 @@ export async function logIn(
     };
   }
   redirect("/trips");
+}
+
+// Sends the visitor to Google's sign-in screen. Google sends them back to
+// /auth/callback on this same site, which finishes the login.
+export async function continueWithGoogle() {
+  const origin = (await headers()).get("origin");
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${origin}/auth/callback` },
+  });
+  if (error || !data.url) {
+    redirect("/login?error=google");
+  }
+  redirect(data.url);
 }
 
 export async function logOut() {
