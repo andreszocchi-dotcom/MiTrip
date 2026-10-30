@@ -2,13 +2,18 @@
 
 Ideas that are out of scope for the solo assignment (due Nov 4, 2026) or held as stretch goals. Parking an idea here keeps it without letting it grow the plan.
 
+## Promoted out of the parking lot
+
+| Idea | Decision |
+|---|---|
+| Paste a Claude itinerary and have the app create days and plans from it | Promoted Oct 29, 2026 to a **4th custom feature**, built right after plans. Reason: after pasting my real honeymoon itinerary (about 29,000 characters), it showed as one big block of text instead of filling in the days. Model: Claude Sonnet 5.5 (my choice, about $0.10 to $0.15 per import). Guardrails: owner only, capped paste size, monthly spend limit in the Anthropic Console. |
+
 ## Stretch goals (in PLAN.md, built only after the committed features ship)
 
 | Order | Idea | Source | Risk |
 |---|---|---|---|
 | 1 | One-time Gmail scan when a trip is added, to find existing bookings | Sketches 04, 05 | High: restricted Gmail permission in Google "testing" mode (hand-added test users only), plus AI to read emails |
-| 2 | Paste a Claude itinerary and have the app create days and plans from it | Sketches 03, 04 | High: Claude API cost and unpredictable output |
-| 3 | Download a trip for offline use | Sketches 02, 04 | Medium |
+| 2 | Download a trip for offline use | Sketches 02, 04 | Medium |
 
 ## Parked (not in the solo plan)
 
