@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { FieldError, errorProps, inputClass } from "@/components/form-field";
 import { THEMES } from "@/lib/themes";
 import type { TripFormState } from "./actions";
 
@@ -13,9 +14,6 @@ type Trip = {
   google_maps_list_url: string | null;
   itinerary_text: string | null;
 };
-
-const inputClass =
-  "rounded-xl border border-black/10 bg-surface px-4 py-3 text-base font-normal outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft";
 
 export function TripForm({
   action,
@@ -29,27 +27,48 @@ export function TripForm({
   cancelHref: string;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  // After a failed save, show what was typed rather than the original values.
+  const values = state?.values ?? trip;
+  const errors = state?.errors ?? {};
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <form action={formAction} className="mt-6 flex flex-col gap-5">
+    // noValidate: our own friendly messages replace the browser's pop-ups.
+    <form action={formAction} noValidate className="mt-6 flex flex-col gap-5">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         Trip name
         <input
           name="name"
-          defaultValue={trip?.name}
+          defaultValue={values?.name}
           placeholder="Australia-NZ Honeymoon"
-          className={inputClass}
+          className={inputClass(!!errors.name)}
+          {...errorProps("name", errors.name)}
         />
+        <FieldError id="name-error" message={errors.name} />
       </label>
 
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           Start date
-          <input name="start_date" type="date" defaultValue={trip?.start_date} className={inputClass} />
+          <input
+            name="start_date"
+            type="date"
+            defaultValue={values?.start_date}
+            className={inputClass(!!errors.start_date)}
+            {...errorProps("start_date", errors.start_date)}
+          />
+          <FieldError id="start_date-error" message={errors.start_date} />
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           End date
-          <input name="end_date" type="date" defaultValue={trip?.end_date} className={inputClass} />
+          <input
+            name="end_date"
+            type="date"
+            defaultValue={values?.end_date}
+            className={inputClass(!!errors.end_date)}
+            {...errorProps("end_date", errors.end_date)}
+          />
+          <FieldError id="end_date-error" message={errors.end_date} />
         </label>
       </div>
 
@@ -62,7 +81,7 @@ export function TripForm({
                 type="radio"
                 name="theme"
                 value={value}
-                defaultChecked={(trip?.theme ?? "ocean") === value}
+                defaultChecked={(values?.theme ?? "ocean") === value}
                 className="peer sr-only"
               />
               <span
@@ -83,10 +102,12 @@ export function TripForm({
           name="google_maps_list_url"
           type="url"
           inputMode="url"
-          defaultValue={trip?.google_maps_list_url ?? ""}
+          defaultValue={values?.google_maps_list_url ?? ""}
           placeholder="https://maps.app.goo.gl/..."
-          className={inputClass}
+          className={inputClass(!!errors.google_maps_list_url)}
+          {...errorProps("google_maps_list_url", errors.google_maps_list_url)}
         />
+        <FieldError id="google_maps_list_url-error" message={errors.google_maps_list_url} />
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
@@ -94,14 +115,14 @@ export function TripForm({
         <textarea
           name="itinerary_text"
           rows={6}
-          defaultValue={trip?.itinerary_text ?? ""}
-          className={inputClass}
+          defaultValue={values?.itinerary_text ?? ""}
+          className={inputClass()}
         />
       </label>
 
-      {state?.error && (
+      {(hasErrors || state?.error) && (
         <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-          {state.error}
+          {state?.error ?? "Almost there. Fix the fields marked in red above."}
         </p>
       )}
 
