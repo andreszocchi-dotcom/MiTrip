@@ -14,4 +14,4 @@ Choices the agent made on its own:
 - Removed the unused starter images in public/.
 - Kept AGENTS.md, a file Next.js generates to tell AI agents to check the docs for this version.
 
-**What I checked / decided:** _(fill in after checking the live URL on my phone)_
+**What I checked / decided:** Imported the repo on Vercel myself and opened https://mi-trip-kappa.vercel.app. My reaction: "Looks like i cant login yet! but it seems live." The agent confirmed the live page served the MiTrip title and pitch.
