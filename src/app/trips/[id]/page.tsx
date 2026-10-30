@@ -7,8 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { themeOf } from "@/lib/themes";
 import { deleteTrip } from "../actions";
+import { ImportButton } from "./import-button";
 
 export const metadata: Metadata = { title: "Trip · MiTrip" };
+// The AI itinerary import can take up to a minute on long itineraries.
+export const maxDuration = 120;
 
 export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const { id } = await params;
@@ -34,6 +37,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
 
   const theme = themeOf(trip.theme);
   const isOwner = trip.owner_id === user.id;
+  const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
@@ -74,6 +78,10 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             {trip.itinerary_text}
           </p>
         </details>
+      )}
+
+      {isOwner && trip.itinerary_text && (
+        <ImportButton tripId={trip.id} existingPlans={totalPlans} />
       )}
 
       <h2 className="mt-8 text-lg font-semibold">Days</h2>

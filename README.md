@@ -10,7 +10,7 @@ Built by Andrés Zocchi as a solo app for Intro to Coding (Solo Demo Day, Nov 4,
 
 ## Status
 
-Sign up, log in, and log out work. Features ship one pull request at a time, in the order listed in [PLAN.md](PLAN.md).
+Working: sign up and login; trips, days, and plans (add, view, edit, delete); AI itinerary import with Google Maps links. Features ship one pull request at a time, in the order listed in [PLAN.md](PLAN.md).
 
 ## Tools
 
@@ -21,6 +21,7 @@ Sign up, log in, and log out work. Features ship one pull request at a time, in 
 | Tailwind CSS 4 | Styling |
 | Vercel | Hosting, redeploys on every merge to main |
 | Supabase | Database (Postgres with Row Level Security), sign up and login, file storage |
+| Claude API (Claude Haiku 5.5) | Reads a pasted itinerary and turns it into days and plans |
 
 ## Run it on your computer
 
@@ -32,12 +33,15 @@ cd MiTrip
 npm install
 ```
 
-Create a file named `.env.local` in the project folder with your Supabase project's URL and publishable key (Supabase dashboard, then Connect):
+Create a file named `.env.local` in the project folder with your Supabase project's URL and publishable key (Supabase dashboard, then Connect), and a Claude API key for the itinerary import (console.anthropic.com, then API Keys):
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+`.env.local` is ignored by Git. On Vercel, add the same variables in the project's Environment Variables (mark `ANTHROPIC_API_KEY` as Secret).
 
 Set up the database tables (from `supabase/migrations/`) and start the app:
 
