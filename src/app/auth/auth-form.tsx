@@ -33,7 +33,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
       <div className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-black/5">
-        <Link href="/" className="text-sm font-medium uppercase tracking-widest text-accent">
+        <Link href="/" className="text-xl font-semibold tracking-tight text-accent">
           MiTrip
         </Link>
         <h1 className="mt-3 text-2xl font-semibold">{copy.title}</h1>
