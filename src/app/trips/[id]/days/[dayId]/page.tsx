@@ -85,33 +85,49 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
           {plans.map((plan) => {
             const type = planTypeOf(plan.type);
             return (
-              <li key={plan.id} className="relative">
-                {plan.address && (
-                  <a
-                    href={googleMapsUrl(plan.address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute top-4 right-4 z-10 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent"
-                  >
-                    Map ↗
-                  </a>
-                )}
+              <li
+                key={plan.id}
+                className="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-black/5"
+              >
+                {/* Every detail shows in full; cards grow taller instead of cutting text off. */}
                 <Link
                   href={`/trips/${trip.id}/plans/${plan.id}`}
-                  className={`flex gap-4 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99] ${plan.address ? "pr-20" : ""}`}
+                  className="flex gap-4 p-5 transition-colors active:bg-black/[0.03]"
                 >
                   <span className="text-2xl" aria-hidden="true">
                     {type.icon}
                   </span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-muted">
                       {plan.start_time ? formatTime(plan.start_time) : type.label}
                       {plan.end_time && ` – ${formatTime(plan.end_time)}`}
                     </p>
                     <p className="font-medium">{plan.title}</p>
-                    {plan.address && <p className="truncate text-sm text-muted">{plan.address}</p>}
+                    {plan.address && (
+                      <p className="mt-0.5 break-words text-sm text-muted">{plan.address}</p>
+                    )}
+                    {plan.notes && (
+                      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed">
+                        {plan.notes}
+                      </p>
+                    )}
+                    {plan.confirmation_number && (
+                      <p className="mt-2 text-xs text-muted">
+                        Confirmation: <span className="font-medium text-foreground">{plan.confirmation_number}</span>
+                      </p>
+                    )}
                   </div>
                 </Link>
+                {plan.address && (
+                  <a
+                    href={googleMapsUrl(plan.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block border-t border-black/5 px-5 py-3 text-center text-sm font-medium text-accent"
+                  >
+                    Open in Google Maps ↗
+                  </a>
+                )}
               </li>
             );
           })}
