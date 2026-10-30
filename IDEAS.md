@@ -15,3 +15,4 @@ Ideas that are out of scope for the solo assignment (due Nov 4, 2026) or held as
 | Idea | Source | Why parked |
 |---|---|---|
 | Link airline apps to pull flight details | Sketch 05 | No shared airline API; flight details are entered by hand instead |
+| Continue with Google sign-in | PLAN.md feature 1 | Postponed Oct 29, 2026 (issue #7). The button code is finished on the `feature/google-login` branch, but it needs a Google Cloud OAuth client that can only be created by hand in the Google Cloud console. Email sign-up already meets the requirement, so time went to the data model. To finish: create the client, fill in the two Google values in `.env.local`, push the Supabase config, open the PR. |
