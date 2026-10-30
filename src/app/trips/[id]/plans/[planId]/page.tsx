@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { formatDay, formatTime } from "@/lib/dates";
+import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
 import { deletePlan } from "../../../plan-actions";
@@ -67,6 +68,17 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
               </div>
             ))}
           </dl>
+        )}
+
+        {plan.address && (
+          <a
+            href={googleMapsUrl(plan.address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 block rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+          >
+            Open in Google Maps ↗
+          </a>
         )}
 
         {plan.ticket_url && (

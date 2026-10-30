@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { formatDay, formatTime } from "@/lib/dates";
+import { googleMapsUrl } from "@/lib/maps";
+import { sortPlansByTime } from "@/lib/plan-order";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
@@ -25,7 +27,6 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
     .select("id, date, greeting, trip_id, trips(id, name, theme, owner_id), plans(*)")
     .eq("id", Number(dayId))
     .eq("trip_id", Number(id))
-    .order("start_time", { referencedTable: "plans", nullsFirst: false })
     .maybeSingle();
   if (!day || !day.trips) {
     notFound();
@@ -42,6 +43,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const nextId = dayIds[index + 1];
 
   const trip = day.trips;
+  const plans = sortPlansByTime(day.plans);
   const theme = themeOf(trip.theme);
   const isOwner = trip.owner_id === user.id;
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
@@ -78,15 +80,25 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         )}
       </div>
 
-      {day.plans.length > 0 ? (
+      {plans.length > 0 ? (
         <ul className="mt-3 flex flex-col gap-3">
-          {day.plans.map((plan) => {
+          {plans.map((plan) => {
             const type = planTypeOf(plan.type);
             return (
-              <li key={plan.id}>
+              <li key={plan.id} className="relative">
+                {plan.address && (
+                  <a
+                    href={googleMapsUrl(plan.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-4 right-4 z-10 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent"
+                  >
+                    Map ↗
+                  </a>
+                )}
                 <Link
                   href={`/trips/${trip.id}/plans/${plan.id}`}
-                  className="flex gap-4 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99]"
+                  className={`flex gap-4 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99] ${plan.address ? "pr-20" : ""}`}
                 >
                   <span className="text-2xl" aria-hidden="true">
                     {type.icon}
