@@ -2,8 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { validateTrip, type FieldErrors } from "@/lib/validation";
 
-export type TripFormState = { error?: string } | undefined;
+// On a problem, the form gets back friendly messages per field plus what
+// was typed, so nothing has to be re-entered.
+export type TripFormState =
+  | { error?: string; errors?: FieldErrors; values?: ReturnType<typeof readTrip> }
+  | undefined;
 
 function readTrip(formData: FormData) {
   const optional = (key: string) => String(formData.get(key) ?? "").trim() || null;
@@ -21,14 +26,16 @@ export async function createTrip(
   _prevState: TripFormState,
   formData: FormData,
 ): Promise<TripFormState> {
+  const trip = readTrip(formData);
+  const errors = validateTrip(trip);
+  if (Object.keys(errors).length > 0) {
+    return { errors, values: trip };
+  }
+
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("trips")
-    .insert(readTrip(formData))
-    .select("id")
-    .single();
+  const { data, error } = await supabase.from("trips").insert(trip).select("id").single();
   if (error) {
-    return { error: "We couldn't save this trip. Check the details and try again." };
+    return { error: "We couldn't save this trip. Please try again.", values: trip };
   }
   redirect(`/trips/${data.id}`);
 }
@@ -38,14 +45,20 @@ export async function updateTrip(
   _prevState: TripFormState,
   formData: FormData,
 ): Promise<TripFormState> {
+  const trip = readTrip(formData);
+  const errors = validateTrip(trip);
+  if (Object.keys(errors).length > 0) {
+    return { errors, values: trip };
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("trips")
-    .update(readTrip(formData))
+    .update(trip)
     .eq("id", tripId)
     .select("id");
   if (error || data.length === 0) {
-    return { error: "We couldn't save your changes. Check the details and try again." };
+    return { error: "We couldn't save your changes. Please try again.", values: trip };
   }
   redirect(`/trips/${tripId}`);
 }

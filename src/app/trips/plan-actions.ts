@@ -2,8 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { validatePlan, type FieldErrors } from "@/lib/validation";
 
-export type PlanFormState = { error?: string } | undefined;
+// On a problem, the form gets back friendly messages per field plus what
+// was typed, so nothing has to be re-entered.
+export type PlanFormState =
+  | { error?: string; errors?: FieldErrors; values?: ReturnType<typeof readPlan> }
+  | undefined;
 
 function readPlan(formData: FormData) {
   const optional = (key: string) => String(formData.get(key) ?? "").trim() || null;
@@ -25,10 +30,16 @@ export async function createPlan(
   _prevState: PlanFormState,
   formData: FormData,
 ): Promise<PlanFormState> {
+  const plan = readPlan(formData);
+  const errors = validatePlan(plan);
+  if (Object.keys(errors).length > 0) {
+    return { errors, values: plan };
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase.from("plans").insert({ day_id: dayId, ...readPlan(formData) });
+  const { error } = await supabase.from("plans").insert({ day_id: dayId, ...plan });
   if (error) {
-    return { error: "We couldn't save this plan. Check the details and try again." };
+    return { error: "We couldn't save this plan. Please try again.", values: plan };
   }
   redirect(`/trips/${tripId}/days/${dayId}`);
 }
@@ -39,14 +50,20 @@ export async function updatePlan(
   _prevState: PlanFormState,
   formData: FormData,
 ): Promise<PlanFormState> {
+  const plan = readPlan(formData);
+  const errors = validatePlan(plan);
+  if (Object.keys(errors).length > 0) {
+    return { errors, values: plan };
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("plans")
-    .update(readPlan(formData))
+    .update(plan)
     .eq("id", planId)
     .select("id");
   if (error || data.length === 0) {
-    return { error: "We couldn't save your changes. Check the details and try again." };
+    return { error: "We couldn't save your changes. Please try again.", values: plan };
   }
   redirect(`/trips/${tripId}/plans/${planId}`);
 }
