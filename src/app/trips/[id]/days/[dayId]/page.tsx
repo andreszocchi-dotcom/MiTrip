@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { DayStrip } from "@/components/day-strip";
 import { PlanCard } from "@/components/plan-card";
 import { formatDay } from "@/lib/dates";
 import { sortPlansByTime } from "@/lib/plan-order";
@@ -34,10 +35,15 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
 
   const { data: tripDays } = await supabase
     .from("days")
-    .select("id")
+    .select("id, date, plans(count)")
     .eq("trip_id", day.trip_id)
     .order("date");
-  const dayIds = (tripDays ?? []).map((d) => d.id);
+  const stripDays = (tripDays ?? []).map((d) => ({
+    id: d.id,
+    date: d.date,
+    planCount: d.plans[0]?.count ?? 0,
+  }));
+  const dayIds = stripDays.map((d) => d.id);
   const index = dayIds.indexOf(day.id);
   const prevId = dayIds[index - 1];
   const nextId = dayIds[index + 1];
@@ -54,6 +60,8 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
       <Link href={`/trips/${trip.id}`} className="mt-6 text-sm font-medium text-muted">
         ← {trip.name}
       </Link>
+
+      <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
 
       <section className="mt-4 rounded-3xl p-6" style={{ backgroundColor: theme.soft }}>
         <p className="text-sm font-medium" style={{ color: theme.strong }}>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { DayStrip } from "@/components/day-strip";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
@@ -70,6 +71,13 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         )}
         {!isOwner && <p className="mt-3 text-sm text-muted">Shared with you (view only)</p>}
       </section>
+
+      <p className="mt-6 text-sm font-medium text-muted">Jump to a day</p>
+      <DayStrip
+        tripId={trip.id}
+        days={trip.days.map((d) => ({ id: d.id, date: d.date, planCount: d.plans[0]?.count ?? 0 }))}
+        color={theme.strong}
+      />
 
       {trip.itinerary_text && (
         <details className="mt-6 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5">
