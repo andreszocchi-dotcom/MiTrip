@@ -26,3 +26,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Printed pages (Save as PDF) go on plain white paper. */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+}

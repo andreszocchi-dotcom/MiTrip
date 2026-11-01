@@ -75,6 +75,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
 
       <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
 
+      <Link
+        href={`/trips/${trip.id}/print`}
+        className="mt-3 block rounded-2xl bg-surface px-5 py-3 text-center text-sm font-medium shadow-sm ring-1 ring-black/5"
+        style={{ color: theme.strong }}
+      >
+        Save as PDF (for no signal)
+      </Link>
+
       <p className="mt-6 text-sm font-medium text-muted">Jump to a day</p>
       <DayStrip
         tripId={trip.id}
