@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { StarButton } from "@/components/star-button";
 import { formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
@@ -23,7 +24,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
 
   const { data: plan } = await supabase
     .from("plans")
-    .select("*, days(id, date, trip_id, trips(owner_id))")
+    .select("*, stars(user_id), days(id, date, trip_id, trips(owner_id))")
     .eq("id", Number(planId))
     .maybeSingle();
   if (!plan || !plan.days || plan.days.trip_id !== Number(id)) {
@@ -48,9 +49,12 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
       </Link>
 
       <section className="mt-4 rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-black/5">
-        <p className="text-sm font-medium text-accent">
-          <span aria-hidden="true">{type.icon}</span> {type.label}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm font-medium text-accent">
+            <span aria-hidden="true">{type.icon}</span> {type.label}
+          </p>
+          <StarButton planId={plan.id} starred={plan.stars.length > 0} size="large" />
+        </div>
         <h1 className="mt-2 text-2xl font-semibold">{plan.title}</h1>
         {plan.start_time && (
           <p className="mt-1 text-lg text-muted">

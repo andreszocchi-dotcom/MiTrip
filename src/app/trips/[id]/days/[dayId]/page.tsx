@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { StarButton } from "@/components/star-button";
 import { formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { sortPlansByTime } from "@/lib/plan-order";
@@ -21,10 +22,11 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
     redirect("/login");
   }
 
-  // Row Level Security hides days of trips I don't own or share.
+  // Row Level Security hides days of trips I don't own or share, and returns
+  // only my own stars, so a plan with any star row here is starred by me.
   const { data: day } = await supabase
     .from("days")
-    .select("id, date, greeting, trip_id, trips(id, name, theme, owner_id), plans(*)")
+    .select("id, date, greeting, trip_id, trips(id, name, theme, owner_id), plans(*, stars(user_id))")
     .eq("id", Number(dayId))
     .eq("trip_id", Number(id))
     .maybeSingle();
@@ -118,16 +120,21 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
                     )}
                   </div>
                 </Link>
-                {plan.address && (
-                  <a
-                    href={googleMapsUrl(plan.address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block border-t border-black/5 px-5 py-3 text-center text-sm font-medium text-accent"
-                  >
-                    Open in Google Maps ↗
-                  </a>
-                )}
+                <div className="flex divide-x divide-black/5 border-t border-black/5">
+                  <div className="flex-1">
+                    <StarButton planId={plan.id} starred={plan.stars.length > 0} />
+                  </div>
+                  {plan.address && (
+                    <a
+                      href={googleMapsUrl(plan.address)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-[2] px-5 py-3 text-center text-sm font-medium text-accent"
+                    >
+                      Open in Google Maps ↗
+                    </a>
+                  )}
+                </div>
               </li>
             );
           })}
