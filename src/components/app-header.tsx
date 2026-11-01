@@ -10,7 +10,10 @@ export function AppHeader() {
       >
         MiTrip
       </Link>
-      <nav className="flex items-center gap-5">
+      <nav className="flex items-center gap-4">
+        <Link href="/search" className="text-sm font-medium text-accent">
+          Search
+        </Link>
         <Link href="/starred" className="text-sm font-medium text-amber-600">
           ★ Starred
         </Link>
