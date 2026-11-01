@@ -4,11 +4,13 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { StarButton } from "@/components/star-button";
+import { TicketUpload } from "@/components/ticket-upload";
 import { formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
 import { deletePlan } from "../../../plan-actions";
+import { removeTicketImage } from "../../../ticket-actions";
 
 export const metadata: Metadata = { title: "Plan · MiTrip" };
 
@@ -35,6 +37,11 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   const type = planTypeOf(plan.type);
   const isOwner = day.trips?.owner_id === user.id;
   const dayHref = `/trips/${day.trip_id}/days/${day.id}`;
+
+  // Ticket photos are private; a signed link lets this page show one for an hour.
+  const { data: ticket } = plan.ticket_image
+    ? await supabase.storage.from("tickets").createSignedUrl(plan.ticket_image, 60 * 60)
+    : { data: null };
 
   const details = [
     { label: "Confirmation", value: plan.confirmation_number },
@@ -94,6 +101,32 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
           >
             Open ticket ↗
           </a>
+        )}
+
+        {ticket?.signedUrl && (
+          <div className="mt-5 border-t border-black/5 pt-5">
+            <p className="text-xs font-medium uppercase text-muted">Ticket</p>
+            <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
+              {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}
+              <img
+                src={ticket.signedUrl}
+                alt={`Ticket for ${plan.title}`}
+                className="max-h-96 w-full rounded-xl bg-background object-contain ring-1 ring-black/5"
+              />
+            </a>
+            <p className="mt-1 text-center text-xs text-muted">Tap to open full size</p>
+            {isOwner && (
+              <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
+                <button type="submit" className="text-sm font-medium text-red-700">
+                  Remove photo
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
+        {isOwner && (
+          <TicketUpload tripId={day.trip_id} planId={plan.id} hasTicket={Boolean(plan.ticket_image)} />
         )}
 
         {plan.notes && (

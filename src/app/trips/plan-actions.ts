@@ -70,6 +70,11 @@ export async function updatePlan(
 
 export async function deletePlan(tripId: number, dayId: number, planId: number) {
   const supabase = await createClient();
-  await supabase.from("plans").delete().eq("id", planId);
+  const { data: plan } = await supabase.from("plans").select("ticket_image").eq("id", planId).maybeSingle();
+  const { data: deleted } = await supabase.from("plans").delete().eq("id", planId).select("id");
+  // Remove the plan's ticket photo too, so no orphaned file is left in storage.
+  if (deleted?.length && plan?.ticket_image) {
+    await supabase.storage.from("tickets").remove([plan.ticket_image]);
+  }
   redirect(`/trips/${tripId}/days/${dayId}`);
 }
