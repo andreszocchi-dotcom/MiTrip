@@ -4,7 +4,9 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { DayStrip } from "@/components/day-strip";
 import { PlanCard } from "@/components/plan-card";
-import { formatDay } from "@/lib/dates";
+import { NextDayLabel, TodayBadge } from "@/components/today-link";
+import { formatDay, formatTime } from "@/lib/dates";
+import { planTypeOf } from "@/lib/plan-types";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
@@ -48,6 +50,16 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const prevId = dayIds[index - 1];
   const nextId = dayIds[index + 1];
 
+  // The "Tomorrow" snapshot: the next day's one-line summary and its plans.
+  const { data: nextDay } = nextId
+    ? await supabase
+        .from("days")
+        .select("id, date, summary, plans(id, title, type, start_time)")
+        .eq("id", nextId)
+        .maybeSingle()
+    : { data: null };
+  const nextPlans = nextDay ? sortPlansByTime(nextDay.plans) : [];
+
   const trip = day.trips;
   const plans = sortPlansByTime(day.plans);
   const theme = themeOf(trip.theme);
@@ -66,6 +78,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
       <section className="mt-4 rounded-3xl p-6" style={{ backgroundColor: theme.soft }}>
         <p className="text-sm font-medium" style={{ color: theme.strong }}>
           Day {index + 1} of {dayIds.length}
+          <TodayBadge date={day.date} color={theme.strong} />
         </p>
         <h1 className="mt-1 text-3xl font-semibold">{formatDay(day.date)}</h1>
         {day.greeting && <p className="mt-2 text-lg">{day.greeting}</p>}
@@ -103,6 +116,38 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         <div className="mt-3 rounded-2xl bg-surface p-6 text-center text-muted shadow-sm ring-1 ring-black/5">
           No plans for this day yet.
         </div>
+      )}
+
+      {nextDay && (
+        <Link
+          href={dayHref(nextDay.id)}
+          className="mt-8 block rounded-3xl p-6 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99]"
+          style={{ backgroundColor: theme.soft }}
+        >
+          <p className="text-sm font-medium" style={{ color: theme.strong }}>
+            <NextDayLabel date={day.date} /> · {formatDay(nextDay.date)}
+          </p>
+          {nextDay.summary && <p className="mt-2 text-lg">{nextDay.summary}</p>}
+          {nextPlans.length > 0 ? (
+            <ul className="mt-3 flex flex-col gap-1.5 text-sm">
+              {nextPlans.map((plan) => (
+                <li key={plan.id} className="flex gap-2">
+                  <span className="w-16 shrink-0 text-muted tabular-nums">
+                    {plan.start_time ? formatTime(plan.start_time) : ""}
+                  </span>
+                  <span>
+                    <span aria-hidden="true">{planTypeOf(plan.type).icon}</span> {plan.title}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            !nextDay.summary && <p className="mt-2 text-sm text-muted">Nothing planned yet.</p>
+          )}
+          <p className="mt-3 text-sm font-medium" style={{ color: theme.strong }}>
+            See the full day ›
+          </p>
+        </Link>
       )}
     </main>
   );

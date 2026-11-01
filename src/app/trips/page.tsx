@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
@@ -20,8 +21,9 @@ export default async function TripsPage() {
   // Row Level Security returns only trips I own or was invited to.
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, name, start_date, end_date, theme, owner_id")
-    .order("start_date");
+    .select("id, name, start_date, end_date, theme, owner_id, days(id, date)")
+    .order("start_date")
+    .order("date", { referencedTable: "days" });
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
@@ -63,6 +65,7 @@ export default async function TripsPage() {
                     <p className="mt-2 text-sm text-muted">Shared with you</p>
                   )}
                 </Link>
+                <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
               </li>
             );
           })}
