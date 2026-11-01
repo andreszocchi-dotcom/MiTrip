@@ -84,7 +84,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         <ImportButton tripId={trip.id} existingPlans={totalPlans} />
       )}
 
-      <h2 className="mt-8 text-lg font-semibold">Days</h2>
+      <div className="mt-8 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Days</h2>
+        {totalPlans > 0 && (
+          <Link href={`/search?trip=${trip.id}`} className="text-sm font-medium text-accent">
+            Search this trip
+          </Link>
+        )}
+      </div>
       <ul className="mt-3 flex flex-col gap-2">
         {trip.days.map((day, index) => {
           const planCount = day.plans[0]?.count ?? 0;
