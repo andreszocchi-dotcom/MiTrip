@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Pages that need a logged-in user.
-const PROTECTED_PATHS = ["/trips"];
+const PROTECTED_PATHS = ["/trips", "/starred"];
 // Pages a logged-in user has no reason to see.
 const LOGGED_OUT_ONLY_PATHS = ["/", "/login", "/signup"];
 
