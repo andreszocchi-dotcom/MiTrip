@@ -59,3 +59,12 @@ Run the tests:
 ```bash
 npm test
 ```
+
+The data isolation test runs against a separate Supabase project with the same tables and rules (never the live data). To run it, create a second Supabase project, apply `supabase/migrations/` to it, turn off email confirmation, and put its URL and publishable key in `.env.test.local`:
+
+```
+TEST_SUPABASE_URL=https://your-test-project.supabase.co
+TEST_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+```
+
+Without that file, `npm test` skips the isolation test and runs the rest.
