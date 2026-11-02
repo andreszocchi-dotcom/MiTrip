@@ -135,3 +135,28 @@ erDiagram
 
 - **Least sure I can build:** trip members. Sharing changes the privacy rules for every table, and that is where a data leak could slip in. To lower the risk, members are read-only for now.
 - **First to cut if time runs short:** the stretch goals, in reverse order (offline download, then AI import, then the Gmail scan). If I'm still short, ticket upload falls back to ticket links only (the ticket_url field). Google sign-in depends on setting up a Google Cloud project; if that stalls, email and password alone still meet the sign-up requirement.
+
+## 8. Plan vs. Reality
+
+Added Nov 2, 2026. Sections 1 to 7 above are the original plan, left unedited. "Who decided" is noted in each row because the agent made some calls and I approved them.
+
+| Planned feature | Shipped / Changed / Cut | Status (Done/Backlogged) | Learning | What changed and why (one line) |
+|---|---|---|---|---|
+| 1. Sign up and login (email + Google) | Changed | Email: Done (#6). Google: Backlogged (#9) | A sign-in option that needs a manual setup in another company's console is a schedule risk, not a coding task. | My call: email works; Google sign-in code is finished on a branch but needs a Google Cloud client created by hand, so I parked it. |
+| 2. Data model | Shipped | Done (#11) | Designing all six tables up front meant later features needed no table changes. | Built as designed; the database also enforces the rules (no blank names, valid types, end after start). See schema.md. |
+| 3. Create / read / update / delete | Shipped | Done (#13, #15, #19) | Plans live three levels deep (trip, day, plan), so each page needs a clear way back up. | Built as planned; #19 shows each plan's full details on the day page, after I couldn't read the full descriptions on my phone. |
+| 4. Validation | Shipped | Done (#21) | | Built as planned. |
+| 5. Stars | Shipped | Done (#23) | | Built as planned (plans only). Starring trips came up later; parked so stars stay in the one table and the deadline holds. |
+| 6. Find things | Shipped | Done (#25) | | Built as planned, plus search in notes and a trip filter. |
+| 7. Dashboard | Changed | Done (#29, test #31) | | The plan said a plans-per-day chart for one trip plus "trips this year" and "total plans in the trip." The agent proposed a plans-by-type chart across all trips; I added total trips and average plans per trip. |
+| 8. Trip members (read-only) | Cut | Backlogged | My plan called this the riskiest feature; when time got short, that made it the first to go. | My call on Nov 1: the table and privacy rules exist, but no invite screen. Today view, ticket upload, and Save as PDF became my 3 features instead. |
+| 9. Today view with tomorrow snapshot | Changed | Done (#35) | "Today" depends on where you are; the server's clock is the wrong one for a trip in Sydney. | The trip doesn't jump to today on its own: a "Today" button does (agent's call, so the day page's back link can't loop). "Today" uses the phone's date. |
+| 10. Ticket upload | Shipped | Done (#37) | | Built as planned. Photos upload straight from the phone because form uploads are capped at 1 to 4.5 MB (agent's call). |
+| 11. Gmail scan (stretch) | Cut | Backlogged | | Never started: restricted Gmail access plus AI reading emails was too big for the time. |
+| 12. AI itinerary import (stretch) | Changed | Done (#17) | Testing against the live API costs real money, including test runs by the agent. | I promoted it on Oct 29 after my real itinerary showed up as one block of text. I picked Sonnet 5.5, then switched to Haiku 5.5 to try the cheaper model. It gets its own capped Anthropic workspace. |
+| 13. Offline download (stretch) | Changed | Done as Save trip as PDF (#39) | A simpler version that covers the real need beats the version I first imagined. | The agent laid out the risks (login expiring offline, iPhone clearing saved data, stale copies); I chose a PDF of the whole trip, with ticket photos, instead. |
+| Not in the plan: day strip | Added | Done (#27) | | My request: jumping from Jan 8 to Jan 12 took too many taps. |
+| Tests (section 4) | Shipped | Done (#31, #33) | The isolation test caught that the "Trip not found" page from my plan didn't exist. | Vitest 4.1 instead of 5 (5 wouldn't install). The isolation test runs on a separate test database so its red run never touched real data. |
+| Libraries (section 5) | Changed | Done | | Recharts was never added; the dashboard's one bar chart is plain styled bars (agent's call). |
+
+_Learning column: drafted by the agent from the PRs and prompt logs. Rewrite these in my own words before submitting._
