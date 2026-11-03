@@ -111,11 +111,24 @@ export function TripForm({
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Itinerary <span className="font-normal text-muted">(optional, paste from Claude or anywhere)</span>
+        <span>
+          Itinerary <span className="font-normal text-muted">(optional)</span>
+        </span>
+        <span id="itinerary_text-help" className="font-normal text-muted">
+          Paste your day-by-day plans, then use ✨ Import on the trip page and AI sorts each item into
+          the right day. No plan yet? Ask Claude or ChatGPT to &ldquo;list my trip day by day&rdquo; and
+          paste the result.
+        </span>
         <textarea
           name="itinerary_text"
           rows={6}
           defaultValue={values?.itinerary_text ?? ""}
+          placeholder={
+            "Day 1 (Mar 12): Fly to Lisbon, TAP 204 lands 9:40am\n" +
+            "Day 2: Belém Tower in the morning, dinner at Ramiro\n" +
+            "Day 3: Day trip to Sintra"
+          }
+          aria-describedby="itinerary_text-help"
           className={inputClass()}
         />
       </label>
