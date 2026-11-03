@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { Logo } from "@/components/logo";
 import { logIn, signUp } from "./actions";
 
 const COPY = {
@@ -33,10 +34,10 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
       <div className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-black/5">
-        <Link href="/" className="text-xl font-semibold tracking-tight text-accent">
-          MiTrip
+        <Link href="/" className="inline-block">
+          <Logo className="h-10 w-auto" />
         </Link>
-        <h1 className="mt-3 text-2xl font-semibold">{copy.title}</h1>
+        <h1 className="mt-4 text-2xl font-semibold">{copy.title}</h1>
 
         <form action={formAction} className="mt-6 flex flex-col gap-4" noValidate>
           <label className="flex flex-col gap-1.5 text-sm font-medium">

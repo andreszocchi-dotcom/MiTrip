@@ -1,13 +1,12 @@
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
       <div className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-black/5">
-        <p className="text-xl font-semibold tracking-tight text-accent">
-          MiTrip
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight">
+        <Logo className="h-14 w-auto" />
+        <h1 className="mt-5 text-3xl font-semibold leading-tight">
           Everything you need for today&apos;s trip, in one place.
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">
