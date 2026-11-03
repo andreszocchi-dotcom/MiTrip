@@ -1,5 +1,5 @@
 // The MiTrip wordmark: a map pin dots the i in "Mi" and a dotted flight path
-// arcs over to the dot on the i in "Trip". Letters are Geist Bold outlines,
+// arcs over to the blue dot on the i in "Trip". Letters are Geist Bold outlines,
 // so the logo looks the same everywhere. Size it with a height class.
 const PIN =
   "M103.4 43C95 33 90.4 26 90.4 18a13 13 0 0 1 26 0c0 8-4.6 15-13 25Zm0-20.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z";
@@ -18,7 +18,7 @@ export function Logo({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeDasharray="0 10"
       />
-      <circle className="fill-foreground" cx={234.7} cy={38.5} r={7.5} />
+      <circle className="fill-accent" cx={234.7} cy={34} r={7.5} />
     </svg>
   );
 }
