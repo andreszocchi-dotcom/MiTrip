@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { logOut } from "@/app/auth/actions";
+import { Logo } from "@/components/logo";
 
 export function AppHeader() {
   return (
     // On narrow phones the links drop to their own row under the logo.
     <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-      <Link
-        href="/trips"
-        className="text-xl font-semibold tracking-tight text-accent"
-      >
-        MiTrip
+      <Link href="/trips">
+        <Logo className="h-10 w-auto" />
       </Link>
       <nav className="flex items-center gap-4 whitespace-nowrap">
         <Link href="/dashboard" className="text-sm font-medium text-accent">
