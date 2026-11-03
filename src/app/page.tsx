@@ -11,7 +11,7 @@ export default function Home() {
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">
           Flights, hotels, reservations, tickets, and directions, organized by
-          day and shared with the people traveling with you.
+          day.
         </p>
         <div className="mt-8 flex flex-col gap-3">
           <Link
