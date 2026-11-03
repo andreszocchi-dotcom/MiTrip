@@ -11,3 +11,10 @@ Agent: Claude Code (Opus) in VS Code. Session date: Nov 2, 2026.
 (My answers to each row, pasted into the Learning column word for word. Trip members uses the reason I gave earlier in the session: "The trip members added lots of complexities, this is because it required a whole set of permission lists to see if someone could edit or just read only".)
 
 **What I checked / decided:** **Every Learning entry is now my own words.** Rows I had nothing to say about (CRUD, validation, find things, tests, libraries) are left blank, and the agent-drafted note under the table is removed.
+
+## Prompt 3
+> yes fix them
+
+(Answering the agent's offer to fix four typos in my Learning entries: "iphoen", "rumaging", "ot", and "unnecesary".)
+
+**What I checked / decided:** **Fixed only those four typos.** Everything else stays word for word.
