@@ -11,6 +11,7 @@ import { StarButton } from "@/components/star-button";
 import { themeOf } from "@/lib/themes";
 import { deleteTrip } from "../actions";
 import { ImportButton } from "./import-button";
+import { People } from "./people";
 
 export const metadata: Metadata = { title: "Trip · MiTrip" };
 // The AI itinerary import can take up to a minute on long itineraries.
@@ -37,6 +38,9 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   if (!trip) {
     notFound();
   }
+
+  // The People list: owner and members with emails (empty if I can't view).
+  const { data: people } = await supabase.rpc("trip_people", { p_trip_id: trip.id });
 
   const theme = themeOf(trip.theme);
   const isOwner = trip.owner_id === user.id;
@@ -143,6 +147,17 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
           );
         })}
       </ul>
+
+      <div className="mt-12">
+        <People
+          tripId={trip.id}
+          tripName={trip.name}
+          isOwner={isOwner}
+          inviteCode={isOwner ? trip.invite_code : null}
+          people={people ?? []}
+          myId={user.id}
+        />
+      </div>
 
       {isOwner && (
         <div className="mt-12 flex flex-wrap gap-3">
