@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DayStrip } from "@/components/day-strip";
+import { ThemeArt } from "@/components/theme-art";
 import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
@@ -46,7 +47,8 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         ‹ My trips
       </Link>
 
-      <section className="mt-4 rounded-[28px] p-7 sm:p-10" style={{ backgroundColor: theme.soft }}>
+      <section className="relative isolate mt-4 overflow-hidden rounded-[28px] p-7 pb-24 sm:p-10 sm:pb-28" style={{ backgroundColor: theme.soft }}>
+        <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-28 w-full" />
         <h1 className="headline-lg" style={{ color: theme.strong }}>
           {trip.name}
         </h1>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DayStrip } from "@/components/day-strip";
 import { PlanCard } from "@/components/plan-card";
+import { ThemeArt } from "@/components/theme-art";
 import { NextDayLabel, TodayBadge } from "@/components/today-link";
 import { formatDay, formatTime } from "@/lib/dates";
 import { dayRouteLinks, routeStops } from "@/lib/maps";
@@ -76,7 +77,8 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
 
       <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
 
-      <section className="mt-4 rounded-[28px] p-7 sm:p-10" style={{ backgroundColor: theme.soft }}>
+      <section className="relative isolate mt-4 overflow-hidden rounded-[28px] p-7 pb-20 sm:p-10 sm:pb-24" style={{ backgroundColor: theme.soft }}>
+        <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-24 w-full" />
         <p className="eyebrow" style={{ color: theme.strong }}>
           Day {index + 1} of {dayIds.length}
           <TodayBadge date={day.date} color={theme.strong} />
