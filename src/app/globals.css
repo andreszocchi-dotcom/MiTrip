@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
-/* MiTrip palette (PLAN.md section 6): calm, minimal, light blue accent */
+/* MiTrip design system. Calm and roomy: neutral grays, near-black text, and
+   one blue accent (the logo's blue, a shade deeper so text passes contrast). */
 :root {
-  --background: #f7fafc;
+  --background: #f5f5f7;
   --surface: #ffffff;
-  --foreground: #1f2933;
-  --muted: #5f6b7a;
-  --accent: #3b82c4;
-  --accent-soft: #e3f0fb;
+  --foreground: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --brand: #3b82c4;
+  --accent: #2f74b5;
+  --accent-hover: #27629a;
+  --accent-soft: #e8f1fa;
+  --ink: #000000;
+  --ink-soft: #1d1d1f;
 }
 
 @theme inline {
@@ -15,21 +21,198 @@
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /* App pages: one centered column with a 16px gutter on phones. */
+  .page {
+    margin-inline: auto;
+    display: flex;
+    width: 100%;
+    max-width: 720px;
+    flex: 1;
+    flex-direction: column;
+    padding: 40px 16px 96px;
+  }
+  @media (min-width: 640px) {
+    .page {
+      padding: 64px 24px 128px;
+    }
+  }
+
+  .headline {
+    font-size: clamp(34px, 6vw, 48px);
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.025em;
+  }
+  .headline-xl {
+    font-size: clamp(44px, 9vw, 96px);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+  .headline-lg {
+    font-size: clamp(36px, 6.5vw, 64px);
+    font-weight: 600;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+  }
+  .subhead {
+    font-size: clamp(19px, 2.4vw, 24px);
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--muted);
+  }
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  /* Flat white tiles on the light gray page. No shadows, no borders. */
+  .tile {
+    border-radius: 22px;
+    background: var(--surface);
+  }
+
+  /* Buttons: pills. Primary is solid blue, secondary is soft gray. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 980px;
+    padding: 12px 22px;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: center;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+  }
+  .btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+  .btn-secondary {
+    background: #e8e8ed;
+    color: var(--foreground);
+  }
+  .btn-secondary:hover {
+    background: #dedee3;
+  }
+  .btn-danger {
+    background: #fdecec;
+    color: #b42318;
+  }
+  .btn-danger:hover {
+    background: #fbdede;
+  }
+
+  /* Text link with a chevron, e.g. "See the full day ›". */
+  .link {
+    color: var(--accent);
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  .link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .field {
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: 12px 16px;
+    font-size: 17px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgb(47 116 181 / 0.18);
+  }
+  .field-error {
+    border-color: #d92d20;
+  }
+  .field-error:focus {
+    border-color: #d92d20;
+    box-shadow: 0 0 0 4px rgb(217 45 32 / 0.15);
+  }
+
+  /* Fade and rise into view on scroll (see components/reveal.tsx). */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Printed pages (Save as PDF) go on plain white paper. */
 @media print {
   body {
     background: #ffffff !important;
+  }
+  .page {
+    max-width: none;
+    padding: 0;
   }
 }

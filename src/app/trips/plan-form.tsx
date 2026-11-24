@@ -52,7 +52,7 @@ export function PlanForm({
                 defaultChecked={(values?.type ?? "activity") === value}
                 className="peer sr-only"
               />
-              <span className="flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-sm ring-1 ring-black/10 peer-checked:bg-accent-soft peer-checked:text-accent peer-checked:ring-2 peer-checked:ring-accent">
+              <span className="flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 text-sm transition-colors peer-checked:bg-foreground peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
                 <span aria-hidden="true">{type.icon}</span>
                 {type.label}
               </span>
@@ -124,7 +124,7 @@ export function PlanForm({
       </label>
 
       {(hasErrors || state?.error) && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           {state?.error ?? "Almost there. Fix the fields marked in red above."}
         </p>
       )}
@@ -132,14 +132,14 @@ export function PlanForm({
       <div className="flex gap-3">
         <Link
           href={cancelHref}
-          className="flex-1 rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+          className="btn btn-secondary flex-1"
         >
           Cancel
         </Link>
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-xl bg-accent px-4 py-3 text-base font-medium text-white disabled:opacity-60"
+          className="btn btn-primary flex-1"
         >
           {pending ? "Saving..." : submitLabel}
         </button>

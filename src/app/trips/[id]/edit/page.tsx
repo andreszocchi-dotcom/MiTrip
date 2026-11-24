@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { createClient } from "@/lib/supabase/server";
 import { updateTrip } from "../../actions";
 import { TripForm } from "../../trip-form";
@@ -24,9 +23,8 @@ export default async function EditTripPage({ params }: PageProps<"/trips/[id]/ed
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <h1 className="mt-8 text-3xl font-semibold">Edit trip</h1>
+    <main className="page">
+      <h1 className="headline">Edit trip</h1>
       <TripForm
         action={updateTrip.bind(null, trip.id)}
         trip={trip}

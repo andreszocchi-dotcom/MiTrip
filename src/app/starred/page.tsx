@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { PlanCard } from "@/components/plan-card";
 import { formatDay, formatTime } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
@@ -33,15 +32,14 @@ export default async function StarredPage() {
     );
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <h1 className="mt-8 text-3xl font-semibold">Starred</h1>
-      <p className="mt-1 text-sm text-muted">
+    <main className="page">
+      <h1 className="headline">Starred</h1>
+      <p className="subhead mt-2 !text-[19px]">
         Your quick list for tickets, boarding passes, and must-dos.
       </p>
 
       {starred.length > 0 ? (
-        <ul className="mt-6 flex flex-col gap-3">
+        <ul className="mt-10 flex flex-col gap-3">
           {starred.map((plan) => {
             const day = plan.days!;
             const trip = day.trips!;
@@ -61,7 +59,7 @@ export default async function StarredPage() {
           })}
         </ul>
       ) : (
-        <div className="mt-6 rounded-2xl bg-surface p-8 text-center shadow-sm ring-1 ring-black/5">
+        <div className="tile mt-10 p-10 text-center">
           <p className="text-3xl" aria-hidden="true">☆</p>
           <p className="mt-2 font-medium">Nothing starred yet</p>
           <p className="mt-1 text-sm text-muted">

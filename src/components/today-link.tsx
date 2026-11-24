@@ -30,7 +30,7 @@ export function TodayLink({
   return (
     <Link
       href={`/trips/${tripId}/days/${todayDay.id}`}
-      className="mt-3 flex items-center justify-between rounded-2xl px-5 py-4 font-semibold text-white shadow-sm"
+      className="mt-3 flex items-center justify-between rounded-[22px] px-5 py-4 font-semibold text-white"
       style={{ backgroundColor: color }}
     >
       <span>Today · Day {days.indexOf(todayDay) + 1}</span>

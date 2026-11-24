@@ -61,7 +61,7 @@ export function TicketUpload({
       />
       <label
         htmlFor={`ticket-${planId}`}
-        className="block cursor-pointer rounded-xl border border-dashed border-accent/50 px-4 py-3 text-center text-base font-medium text-accent"
+        className="block cursor-pointer rounded-[12px] border border-dashed border-accent/50 px-4 py-3 text-center text-base font-medium text-accent"
       >
         {busy ? "Uploading…" : hasTicket ? "Replace ticket photo" : "📷 Add ticket photo"}
       </label>

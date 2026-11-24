@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { DayStrip } from "@/components/day-strip";
 import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
@@ -42,17 +41,16 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <Link href="/trips" className="mt-6 text-sm font-medium text-muted">
-        ← My trips
+    <main className="page">
+      <Link href="/trips" className="link text-sm">
+        ‹ My trips
       </Link>
 
-      <section className="mt-4 rounded-3xl p-6" style={{ backgroundColor: theme.soft }}>
-        <h1 className="text-3xl font-semibold" style={{ color: theme.strong }}>
+      <section className="mt-4 rounded-[28px] p-7 sm:p-10" style={{ backgroundColor: theme.soft }}>
+        <h1 className="headline-lg" style={{ color: theme.strong }}>
           {trip.name}
         </h1>
-        <p className="mt-2 text-foreground">
+        <p className="mt-3 text-[19px] text-foreground">
           {formatDateRange(trip.start_date, trip.end_date)}
           <span className="text-muted">
             {" · "}
@@ -64,7 +62,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             href={trip.google_maps_list_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-block rounded-full bg-surface px-4 py-2 text-sm font-medium"
+            className="btn btn-sm mt-6 bg-surface"
             style={{ color: theme.strong }}
           >
             Open my Google Maps list ↗
@@ -77,13 +75,16 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
 
       <Link
         href={`/trips/${trip.id}/print`}
-        className="mt-3 block rounded-2xl bg-surface px-5 py-3 text-center text-sm font-medium shadow-sm ring-1 ring-black/5"
-        style={{ color: theme.strong }}
+        className="tile mt-3 flex items-center justify-between px-6 py-4 transition-colors hover:bg-white/70"
       >
-        Save as PDF (for no signal)
+        <span>
+          <span className="block font-medium">Save as PDF</span>
+          <span className="block text-sm text-muted">For when there&apos;s no signal</span>
+        </span>
+        <span className="text-muted" aria-hidden="true">›</span>
       </Link>
 
-      <p className="mt-6 text-sm font-medium text-muted">Jump to a day</p>
+      <p className="mt-10 text-sm font-medium text-muted">Jump to a day</p>
       <DayStrip
         tripId={trip.id}
         days={trip.days.map((d) => ({ id: d.id, date: d.date, planCount: d.plans[0]?.count ?? 0 }))}
@@ -91,7 +92,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
       />
 
       {trip.itinerary_text && (
-        <details className="mt-6 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5">
+        <details className="tile mt-6 p-6">
           <summary className="cursor-pointer font-medium">Itinerary</summary>
           <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted">
             {trip.itinerary_text}
@@ -103,22 +104,22 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         <ImportButton tripId={trip.id} existingPlans={totalPlans} />
       )}
 
-      <div className="mt-8 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Days</h2>
+      <div className="mt-12 flex items-baseline justify-between">
+        <h2 className="section-title">Days</h2>
         {totalPlans > 0 && (
-          <Link href={`/search?trip=${trip.id}`} className="text-sm font-medium text-accent">
+          <Link href={`/search?trip=${trip.id}`} className="link text-sm">
             Search this trip
           </Link>
         )}
       </div>
-      <ul className="mt-3 flex flex-col gap-2">
+      <ul className="tile mt-4 divide-y divide-black/[0.06] overflow-hidden">
         {trip.days.map((day, index) => {
           const planCount = day.plans[0]?.count ?? 0;
           return (
             <li key={day.id}>
               <Link
                 href={`/trips/${trip.id}/days/${day.id}`}
-                className="flex items-center justify-between rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99]"
+                className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-black/[0.02] active:bg-black/[0.04]"
               >
                 <div>
                   <p className="font-medium">
@@ -136,10 +137,10 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
       </ul>
 
       {isOwner && (
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-12 flex flex-wrap gap-3">
           <Link
             href={`/trips/${trip.id}/edit`}
-            className="flex-1 rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+            className="btn btn-secondary flex-1"
           >
             Edit trip
           </Link>

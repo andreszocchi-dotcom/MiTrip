@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { createClient } from "@/lib/supabase/server";
 import { updatePlan } from "../../../../plan-actions";
 import { PlanForm } from "../../../../plan-form";
@@ -24,9 +23,8 @@ export default async function EditPlanPage({ params }: PageProps<"/trips/[id]/pl
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <h1 className="mt-8 text-3xl font-semibold">Edit plan</h1>
+    <main className="page">
+      <h1 className="headline">Edit plan</h1>
       <PlanForm
         action={updatePlan.bind(null, plan.days.trip_id, plan.id)}
         plan={plan}

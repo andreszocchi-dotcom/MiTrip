@@ -57,7 +57,7 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
       </div>
 
       <header className="mt-8 border-b-4 pb-4 print:mt-0" style={{ borderColor: theme.strong }}>
-        <h1 className="text-3xl font-semibold" style={{ color: theme.strong }}>
+        <h1 className="headline" style={{ color: theme.strong }}>
           {trip.name}
         </h1>
         <p className="mt-1 text-foreground">
@@ -82,7 +82,7 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                 const type = planTypeOf(plan.type);
                 const photo = plan.ticket_image ? ticketUrl.get(plan.ticket_image) : undefined;
                 return (
-                  <li key={plan.id} className="break-inside-avoid rounded-xl p-4 ring-1 ring-black/10">
+                  <li key={plan.id} className="break-inside-avoid rounded-[12px] p-4 ring-1 ring-black/10">
                     <p className="text-sm text-muted">
                       {plan.start_time && (
                         <span className="font-medium text-foreground">

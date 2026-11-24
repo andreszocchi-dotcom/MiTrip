@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { computeDashboardStats, todayIso } from "@/lib/dashboard-stats";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,10 +8,10 @@ export const metadata: Metadata = { title: "Dashboard · MiTrip" };
 
 function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
-    <div className="rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-black/5">
+    <div className="tile p-5 sm:p-6">
       <p className="text-sm text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums">{value}</p>
-      {detail && <p className="mt-1 truncate text-sm text-muted">{detail}</p>}
+      <p className="mt-1 text-[40px] font-semibold leading-none tracking-[-0.03em] tabular-nums">{value}</p>
+      {detail && <p className="mt-2 truncate text-sm text-muted">{detail}</p>}
     </div>
   );
 }
@@ -48,20 +47,19 @@ export default async function DashboardPage() {
       : `${next.daysAway === 1 ? "day" : "days"} until ${next.name}`;
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <h1 className="mt-8 text-3xl font-semibold">Dashboard</h1>
-      <p className="mt-1 text-sm text-muted">Your trips at a glance.</p>
+    <main className="page">
+      <h1 className="headline">Dashboard</h1>
+      <p className="subhead mt-2 !text-[19px]">Your trips at a glance.</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4">
         <StatTile label="Total trips" value={`${stats.totalTrips}`} />
         <StatTile label="Total plans" value={`${stats.totalPlans}`} />
         <StatTile label="Avg plans per trip" value={stats.averagePlansPerTrip.toFixed(1)} />
         <StatTile label="Next trip" value={nextValue} detail={nextDetail} />
       </div>
 
-      <section className="mt-6 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-black/5">
-        <h2 className="font-semibold">Plans by type</h2>
+      <section className="tile mt-4 p-6 sm:p-8">
+        <h2 className="section-title">Plans by type</h2>
         {stats.totalPlans > 0 ? (
           <table className="mt-4 w-full border-separate border-spacing-y-2">
             <caption className="sr-only">Number of plans of each type</caption>
@@ -81,7 +79,7 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-2">
                       {row.count > 0 && (
                         <div
-                          className="h-3 rounded-r bg-accent"
+                          className="h-2.5 rounded-full bg-accent"
                           style={{ width: `${(row.count / maxCount) * 80}%` }}
                           aria-hidden="true"
                         />
