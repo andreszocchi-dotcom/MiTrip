@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* dark: means the phone is dark and Light wasn't chosen, or Dark was
+   chosen in the footer's Appearance switch (data-theme on <html>). */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+  &:where(:root[data-theme="dark"] *) {
+    @slot;
+  }
+}
+
 /* MiTrip design system. Calm and roomy: neutral grays, near-black text, and
    one blue accent (the logo's blue, a shade deeper so text passes contrast). */
 :root {
@@ -26,7 +39,7 @@
 /* Dark mode follows the phone's setting, like Apple's own apps. Pure black
    page, lifted gray surfaces, softer white text, a brighter blue. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #000000;
     --surface: #1c1c1e;
     --foreground: #f5f5f7;
@@ -47,6 +60,26 @@
     color-scheme: dark;
   }
 }
+:root[data-theme="dark"] {
+    --background: #000000;
+    --surface: #1c1c1e;
+    --foreground: #f5f5f7;
+    --muted: #98989d;
+    --line: #3a3a3c;
+    --brand: #5aa3e6;
+    --accent: #4a9ff5;
+    --accent-hover: #6cb2f7;
+    --accent-soft: #10243a;
+    --ink: #1c1c1e;
+    --ink-soft: #2c2c2e;
+    --secondary: #2c2c2e;
+    --secondary-hover: #3a3a3c;
+    --danger-bg: #3a1513;
+    --danger-bg-hover: #4a1b18;
+    --danger: #ff8a80;
+    --nav: rgb(22 22 23 / 0.78);
+    color-scheme: dark;
+  }
 
 @theme inline {
   --color-background: var(--background);
@@ -228,13 +261,19 @@ body {
     --tc-strong: var(--t-strong);
   }
   @media (prefers-color-scheme: dark) {
-    .t-scope {
+    :root:not([data-theme="light"]) .t-scope {
       --tc-sky: var(--t-sky-n);
       --tc-ink: var(--t-ink-n);
       --tc-soft: var(--t-soft-n);
       --tc-strong: var(--t-strong-n);
     }
   }
+  :root[data-theme="dark"] .t-scope {
+      --tc-sky: var(--t-sky-n);
+      --tc-ink: var(--t-ink-n);
+      --tc-soft: var(--t-soft-n);
+      --tc-strong: var(--t-strong-n);
+    }
 
   /* Fade and rise into view on scroll (see components/reveal.tsx). */
   .reveal {
@@ -268,9 +307,11 @@ body {
    phone's light or dark mode. */
 .scene-night { display: none; }
 @media (prefers-color-scheme: dark) {
-  .scene-day { display: none; }
-  .scene-night { display: block; }
+  :root:not([data-theme="light"]) .scene-day { display: none; }
+  :root:not([data-theme="light"]) .scene-night { display: block; }
 }
+:root[data-theme="dark"] .scene-day { display: none; }
+:root[data-theme="dark"] .scene-night { display: block; }
 
 @keyframes scene-drift { to { transform: translateX(-400px); } }
 @keyframes scene-drift-160 { to { transform: translateX(-480px); } }
@@ -299,7 +340,8 @@ body {
 
 /* Printed pages (Save as PDF) go on plain white paper, even in dark mode. */
 @media print {
-  :root {
+  :root,
+  :root[data-theme] {
     --background: #ffffff;
     --surface: #ffffff;
     --foreground: #1d1d1f;
