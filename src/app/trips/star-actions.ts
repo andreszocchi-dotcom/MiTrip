@@ -20,3 +20,19 @@ export async function setStar(planId: number, starred: boolean) {
   }
   refresh();
 }
+
+// The same for a whole trip, in the trip_stars table.
+export async function setTripStar(tripId: number, starred: boolean) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  if (starred) {
+    await supabase.from("trip_stars").upsert({ user_id: user.id, trip_id: tripId });
+  } else {
+    await supabase.from("trip_stars").delete().eq("trip_id", tripId).eq("user_id", user.id);
+  }
+  refresh();
+}

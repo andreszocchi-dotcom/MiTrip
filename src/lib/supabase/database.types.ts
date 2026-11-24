@@ -193,6 +193,39 @@ export type Database = {
           },
         ]
       }
+      trip_stars: {
+        Row: {
+          created_at: string
+          trip_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          trip_id: number
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          trip_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stars_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stars_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           created_at: string
