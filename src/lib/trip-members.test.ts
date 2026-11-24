@@ -21,14 +21,18 @@ async function signUp(client: ReturnType<typeof newClient>, tag: string) {
 }
 
 describe.skipIf(!url || !key)("trip members by invite link", () => {
-  const owner = newClient();
-  const friend = newClient();
-  const stranger = newClient();
+  // Made in beforeAll, so a run without the test project skips cleanly.
+  let owner: ReturnType<typeof newClient>;
+  let friend: ReturnType<typeof newClient>;
+  let stranger: ReturnType<typeof newClient>;
   let tripId: number;
   let friendId: string;
   const code = `test-invite-${Date.now()}-abcdef`;
 
   beforeAll(async () => {
+    owner = newClient();
+    friend = newClient();
+    stranger = newClient();
     await signUp(owner, "owner");
     friendId = await signUp(friend, "friend");
     await signUp(stranger, "stranger");
