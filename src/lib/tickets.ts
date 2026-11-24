@@ -3,3 +3,9 @@
 export function isPdfTicket(path: string | null | undefined) {
   return Boolean(path?.toLowerCase().endsWith(".pdf"));
 }
+
+// An Apple Wallet pass (.pkpass), like the boarding pass airlines email.
+// Opened in Safari on an iPhone, it shows in Wallet.
+export function isWalletPass(path: string | null | undefined) {
+  return Boolean(path?.toLowerCase().endsWith(".pkpass"));
+}

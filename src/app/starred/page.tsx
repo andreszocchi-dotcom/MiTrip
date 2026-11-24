@@ -23,7 +23,7 @@ export default async function StarredPage() {
     supabase
       .from("stars")
       .select(
-        "plan_id, plans(id, title, type, start_time, end_time, address, confirmation_number, ticket_url, days(id, date, trip_id, trips(name, theme)))",
+        "plan_id, plans(id, title, type, start_time, end_time, address, confirmation_number, flight_number, ticket_url, days(id, date, trip_id, trips(name, theme)))",
       ),
     supabase.from("trip_stars").select("trip_id, trips(id, name, start_date, end_date, theme)"),
   ]);

@@ -96,6 +96,7 @@ export type Database = {
           created_at: string
           day_id: number
           end_time: string | null
+          flight_number: string | null
           id: number
           notes: string | null
           start_time: string | null
@@ -110,6 +111,7 @@ export type Database = {
           created_at?: string
           day_id: number
           end_time?: string | null
+          flight_number?: string | null
           id?: never
           notes?: string | null
           start_time?: string | null
@@ -124,6 +126,7 @@ export type Database = {
           created_at?: string
           day_id?: number
           end_time?: string | null
+          flight_number?: string | null
           id?: never
           notes?: string | null
           start_time?: string | null

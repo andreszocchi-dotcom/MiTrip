@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { StarButton } from "@/components/star-button";
 import { formatTime } from "@/lib/dates";
+import { airlineOf, flightOf, flightStatusUrl, formatFlight } from "@/lib/flights";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { T, tripScope, type Theme } from "@/lib/themes";
@@ -14,6 +15,7 @@ export type PlanCardPlan = {
   address: string | null;
   notes?: string | null;
   confirmation_number: string | null;
+  flight_number?: string | null;
   ticket_url?: string | null;
 };
 
@@ -34,6 +36,8 @@ export function PlanCard({
   showTicket?: boolean;
 }) {
   const type = planTypeOf(plan.type);
+  const flight = flightOf(plan);
+  const airline = flight ? airlineOf(flight) : null;
   return (
     <li className={`relative ${context ? tripScope(context.theme).className : ""}`} style={context ? tripScope(context.theme).style : undefined}>
       <div className="tile overflow-hidden">
@@ -80,6 +84,23 @@ export function PlanCard({
         >
           Open ticket ↗
         </a>
+      )}
+      {flight && (
+        <div className="flex divide-x divide-foreground/[0.06] border-t border-foreground/[0.06] text-sm">
+          <a
+            href={flightStatusUrl(flight)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link flex-1 px-4 py-3 text-center"
+          >
+            {formatFlight(flight)} status ↗
+          </a>
+          {airline && (
+            <a href={airline.url} target="_blank" rel="noopener noreferrer" className="link flex-1 px-4 py-3 text-center">
+              Open {airline.name} ↗
+            </a>
+          )}
+        </div>
       )}
       <div className="flex divide-x divide-foreground/[0.06] border-t border-foreground/[0.06]">
         <div className="flex-1">

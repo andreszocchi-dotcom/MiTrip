@@ -1,3 +1,4 @@
+import { parseFlightNumber } from "@/lib/flights";
 // Validation rules for the trip and plan forms (PLAN.md feature 4).
 // Each function returns a friendly message per field that has a problem,
 // or an empty object when everything is fine. The server runs these before
@@ -51,12 +52,16 @@ export type PlanInput = {
   title: string;
   type: string;
   ticket_url: string | null;
+  flight_number?: string | null;
 };
 
 export function validatePlan(plan: PlanInput): FieldErrors {
   const errors: FieldErrors = {};
   if (!plan.title) errors.title = "Give this plan a title, like “Dinner at Aria”.";
   if (!PLAN_TYPE_VALUES.includes(plan.type)) errors.type = "Choose what kind of plan this is.";
+  if (plan.flight_number && !parseFlightNumber(plan.flight_number)) {
+    errors.flight_number = "That doesn’t look like a flight number. Try the airline code and number, like QF 1.";
+  }
   if (plan.ticket_url && !isWebLink(plan.ticket_url)) {
     errors.ticket_url = "That doesn’t look like a link. Paste the full address starting with https://";
   }

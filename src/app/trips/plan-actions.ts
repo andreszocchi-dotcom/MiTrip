@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formatFlight, parseFlightNumber } from "@/lib/flights";
 import { validatePlan, type FieldErrors } from "@/lib/validation";
 
 // On a problem, the form gets back friendly messages per field plus what
@@ -12,9 +13,15 @@ export type PlanFormState =
 
 function readPlan(formData: FormData) {
   const optional = (key: string) => String(formData.get(key) ?? "").trim() || null;
+  const type = String(formData.get("type") ?? "");
+  // Flights only; stored tidy ("qf001" -> "QF 1"), or as typed if it doesn't
+  // look like a flight number, so validation can point it out.
+  const typedFlight = type === "flight" ? optional("flight_number") : null;
+  const flight = parseFlightNumber(typedFlight);
   return {
     title: String(formData.get("title") ?? "").trim(),
-    type: String(formData.get("type") ?? ""),
+    type,
+    flight_number: flight ? formatFlight(flight) : typedFlight,
     start_time: optional("start_time"),
     end_time: optional("end_time"),
     address: optional("address"),
