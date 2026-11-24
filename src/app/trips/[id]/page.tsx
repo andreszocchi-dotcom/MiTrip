@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { DayStrip } from "@/components/day-strip";
+import { LocalTime } from "@/components/local-time";
+import { WeatherBadge } from "@/components/weather-badge";
 import { Icon, type IconName } from "@/components/icons";
 import { StarButton } from "@/components/star-button";
 import { SubNav } from "@/components/sub-nav";
@@ -10,6 +12,8 @@ import { TodayLink } from "@/components/today-link";
 import { TripCountdown } from "@/components/trip-countdown";
 import { SceneBanner } from "@/components/trip-scene";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
+import { dayPlace, placeOf, shortPlace } from "@/lib/places";
+import { weatherForDays } from "@/lib/weather";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
 import { deleteTrip } from "../actions";
@@ -73,7 +77,9 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   // so another user's trip shows "Trip not found".
   const { data: trip } = await supabase
     .from("trips")
-    .select("*, trip_stars(user_id), days(id, date, greeting, plans(count))")
+    .select(
+      "*, trip_stars(user_id), days(id, date, greeting, place_name, latitude, longitude, timezone, plans(count))",
+    )
     .eq("id", Number(id))
     .order("date", { referencedTable: "days" })
     .maybeSingle();
@@ -88,6 +94,10 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const isOwner = trip.owner_id === user.id;
   const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
   const dayCount = countDays(trip.start_date, trip.end_date);
+
+  // Each day's city (its own, else the trip's) and forecast, where there is one.
+  const tripPlace = placeOf(trip);
+  const dayWeather = await weatherForDays(trip.days.map((d) => ({ date: d.date, place: dayPlace(d, trip) })));
 
   return (
     <main className="flex flex-1 flex-col">
@@ -111,12 +121,18 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
       <section style={{ backgroundColor: theme.sky, color: theme.ink }}>
         <div className="mx-auto max-w-[980px] px-4 pt-14 text-center sm:pt-24">
           <p className="eyebrow opacity-80">
-            <TripCountdown start={trip.start_date} end={trip.end_date} />
+            <TripCountdown start={trip.start_date} end={trip.end_date} timezone={trip.timezone} />
           </p>
           <h1 className="headline-xl mx-auto mt-2 max-w-[900px] text-balance">{trip.name}</h1>
           <p className="mt-4 text-[19px] opacity-80 sm:text-[24px]">
             {formatDateRange(trip.start_date, trip.end_date)} · {dayCount} days
           </p>
+          {tripPlace && (
+            <p className="mt-2 text-[15px] opacity-75">
+              📍 {shortPlace(tripPlace)}
+              <LocalTime timezone={tripPlace.timezone} place={shortPlace(tripPlace)} className="before:content-['_·_']" />
+            </p>
+          )}
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="large" />
           </div>
@@ -130,7 +146,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
       </section>
 
       <div className="page !pt-10">
-        <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
+        <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} timezone={trip.timezone} />
 
         {/* Quick actions */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
@@ -185,6 +201,8 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
           <ul className="tile mt-4 divide-y divide-black/[0.06] overflow-hidden">
             {trip.days.map((day, index) => {
               const planCount = day.plans[0]?.count ?? 0;
+              const weather = dayWeather[index];
+              const ownPlace = placeOf(day);
               return (
                 <li key={day.id}>
                   <Link
@@ -199,8 +217,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">{formatDay(day.date)}</span>
-                      {day.greeting && <span className="block truncate text-sm text-muted">{day.greeting}</span>}
+                      {(day.greeting || ownPlace) && (
+                        <span className="block truncate text-sm text-muted">
+                          {ownPlace && `📍 ${shortPlace(ownPlace)}${day.greeting ? " · " : ""}`}
+                          {day.greeting}
+                        </span>
+                      )}
                     </span>
+                    {weather && <WeatherBadge weather={weather} size="small" className="shrink-0 text-sm" />}
                     <span className="shrink-0 text-sm text-muted">
                       {planCount > 0 ? `${planCount} ${planCount === 1 ? "plan" : "plans"}` : ""} ›
                     </span>

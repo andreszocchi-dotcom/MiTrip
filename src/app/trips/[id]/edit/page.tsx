@@ -16,7 +16,7 @@ export default async function EditTripPage({ params }: PageProps<"/trips/[id]/ed
 
   const { data: trip } = await supabase
     .from("trips")
-    .select("id, owner_id, name, start_date, end_date, theme, google_maps_list_url, itinerary_text")
+    .select("id, owner_id, name, start_date, end_date, theme, google_maps_list_url, itinerary_text, place_name, latitude, longitude, timezone")
     .eq("id", Number(id))
     .maybeSingle();
   if (!trip || trip.owner_id !== user?.id) {

@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { DayPlace } from "@/components/day-place";
 import { DayStrip } from "@/components/day-strip";
 import { Icon } from "@/components/icons";
 import { PlanCard } from "@/components/plan-card";
 import { SubNav } from "@/components/sub-nav";
+import { LocalTime } from "@/components/local-time";
 import { NextDayLabel, TodayBadge } from "@/components/today-link";
+import { WeatherBadge } from "@/components/weather-badge";
 import { SceneBanner } from "@/components/trip-scene";
 import { formatDay, formatTime } from "@/lib/dates";
 import { dayRouteLinks, routeStops } from "@/lib/maps";
+import { dayPlace, placeOf, shortPlace } from "@/lib/places";
+import { forecastFor } from "@/lib/weather";
 import { planTypeOf } from "@/lib/plan-types";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { createClient } from "@/lib/supabase/server";
@@ -30,7 +35,9 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   // only my own stars, so a plan with any star row here is starred by me.
   const { data: day } = await supabase
     .from("days")
-    .select("id, date, greeting, trip_id, trips(id, name, theme, owner_id), plans(*, stars(user_id))")
+    .select(
+      "id, date, greeting, trip_id, place_name, latitude, longitude, timezone, trips(id, name, theme, owner_id, place_name, latitude, longitude, timezone), plans(*, stars(user_id))",
+    )
     .eq("id", Number(dayId))
     .eq("trip_id", Number(id))
     .maybeSingle();
@@ -71,6 +78,11 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const routeLinks = dayRouteLinks(stops);
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
 
+  // Where this day happens (its own city, else the trip's), for weather and
+  // local time.
+  const place = dayPlace(day, trip);
+  const weather = place ? ((await forecastFor(place)).get(day.date) ?? null) : null;
+
   // The stops as the route panel lists them: the first plan at each place.
   const stopPlans = plans.filter(
     (plan, i) =>
@@ -109,12 +121,30 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         <div className="mx-auto max-w-[980px] px-4 pt-12 text-center sm:pt-20">
           <p className="eyebrow opacity-80">
             Day {index + 1}
-            <TodayBadge date={day.date} color={theme.ink} />
+            <TodayBadge date={day.date} color={theme.ink} timezone={place?.timezone} />
           </p>
           <h1 className="headline-xl mt-2">{formatDay(day.date)}</h1>
           {day.greeting && (
             <p className="mx-auto mt-4 max-w-[640px] text-[19px] leading-snug opacity-85 sm:text-[24px]">
               {day.greeting}
+            </p>
+          )}
+          {weather && (
+            <div className="mt-5">
+              <WeatherBadge weather={weather} />
+            </div>
+          )}
+          <DayPlace
+            tripId={trip.id}
+            dayId={day.id}
+            place={place}
+            ownPlace={placeOf(day)}
+            tripPlace={placeOf(trip)}
+            canEdit={isOwner}
+          />
+          {place && (
+            <p className="mt-1 text-sm opacity-70">
+              <LocalTime timezone={place.timezone} place={shortPlace(place)} />
             </p>
           )}
         </div>
@@ -210,7 +240,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
             style={{ backgroundColor: theme.soft }}
           >
             <p className="eyebrow" style={{ color: theme.strong }}>
-              <NextDayLabel date={day.date} /> · {formatDay(nextDay.date)}
+              <NextDayLabel date={day.date} timezone={place?.timezone} /> · {formatDay(nextDay.date)}
             </p>
             {nextDay.summary && <p className="mt-2 text-[21px] font-semibold tracking-[-0.02em]">{nextDay.summary}</p>}
             {nextPlans.length > 0 ? (

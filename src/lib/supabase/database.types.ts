@@ -44,21 +44,33 @@ export type Database = {
           date: string
           greeting: string | null
           id: number
+          latitude: number | null
+          longitude: number | null
+          place_name: string | null
           summary: string | null
+          timezone: string | null
           trip_id: number
         }
         Insert: {
           date: string
           greeting?: string | null
           id?: never
+          latitude?: number | null
+          longitude?: number | null
+          place_name?: string | null
           summary?: string | null
+          timezone?: string | null
           trip_id: number
         }
         Update: {
           date?: string
           greeting?: string | null
           id?: never
+          latitude?: number | null
+          longitude?: number | null
+          place_name?: string | null
           summary?: string | null
+          timezone?: string | null
           trip_id?: number
         }
         Relationships: [
@@ -234,10 +246,14 @@ export type Database = {
           id: number
           invite_code: string | null
           itinerary_text: string | null
+          latitude: number | null
+          longitude: number | null
           name: string
           owner_id: string
+          place_name: string | null
           start_date: string
           theme: string
+          timezone: string | null
         }
         Insert: {
           created_at?: string
@@ -246,10 +262,14 @@ export type Database = {
           id?: never
           invite_code?: string | null
           itinerary_text?: string | null
+          latitude?: number | null
+          longitude?: number | null
           name: string
           owner_id?: string
+          place_name?: string | null
           start_date: string
           theme?: string
+          timezone?: string | null
         }
         Update: {
           created_at?: string
@@ -258,10 +278,14 @@ export type Database = {
           id?: never
           invite_code?: string | null
           itinerary_text?: string | null
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           owner_id?: string
+          place_name?: string | null
           start_date?: string
           theme?: string
+          timezone?: string | null
         }
         Relationships: [
           {
