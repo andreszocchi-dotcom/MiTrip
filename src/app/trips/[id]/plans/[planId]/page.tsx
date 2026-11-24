@@ -8,11 +8,12 @@ import { StarButton } from "@/components/star-button";
 import { SubNav } from "@/components/sub-nav";
 import { TicketUpload } from "@/components/ticket-upload";
 import { formatDay, formatTime } from "@/lib/dates";
+import { airlineOf, flightOf, flightStatusUrl, formatFlight } from "@/lib/flights";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
 import { T, themeOf, tripScope } from "@/lib/themes";
-import { isPdfTicket } from "@/lib/tickets";
+import { isPdfTicket, isWalletPass } from "@/lib/tickets";
 import { deletePlan } from "../../../plan-actions";
 import { removeTicketImage } from "../../../ticket-actions";
 
@@ -45,6 +46,9 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   // Tickets (photos or PDFs) are private; a signed link lets this page show
   // or open one for an hour.
   const ticketIsPdf = isPdfTicket(plan.ticket_image);
+  const ticketIsPass = isWalletPass(plan.ticket_image);
+  const flight = flightOf(plan);
+  const airline = flight ? airlineOf(flight) : null;
   const { data: ticket } = plan.ticket_image
     ? await supabase.storage.from("tickets").createSignedUrl(plan.ticket_image, 60 * 60)
     : { data: null };
@@ -52,7 +56,13 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   const theme = themeOf(day.trips?.theme ?? "ocean");
 
   const scope = tripScope(theme);
-  const details: { label: string; value: string; icon: IconName; href?: string }[] = [];
+  const details: { label: string; value: string; icon: IconName; href?: string; action?: string }[] = [];
+  if (flight) {
+    details.push({ label: "Flight", icon: "plane", value: formatFlight(flight), href: flightStatusUrl(flight), action: "Live status ↗" });
+    if (airline) {
+      details.push({ label: "Airline", icon: "phone", value: airline.name, href: airline.url, action: "Open ↗" });
+    }
+  }
   if (plan.address) {
     details.push({ label: "Where", icon: "pin", value: plan.address, href: googleMapsUrl(plan.address) });
   }
@@ -107,7 +117,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                     <span className="block text-[13px] text-muted">{d.label}</span>
                     <span className={`block break-words ${d.href ? "" : "select-all"}`}>{d.value}</span>
                   </span>
-                  {d.href && <span className="link text-sm">Open ↗</span>}
+                  {d.href && <span className="link shrink-0 text-sm">{d.action ?? "Open ↗"}</span>}
                 </>
               );
               return (
@@ -172,7 +182,28 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                 )}
               </>
             )}
-            {ticket?.signedUrl && !ticketIsPdf && (
+            {ticket?.signedUrl && ticketIsPass && (
+              <>
+                <a
+                  href={ticket.signedUrl}
+                  className="mt-3 flex items-center justify-center gap-2.5 rounded-[14px] bg-black px-5 py-3.5 font-medium text-white ring-1 ring-white/15 transition-opacity hover:opacity-90"
+                >
+                  <Icon name="wallet" className="h-5 w-5" />
+                  Add to Apple Wallet
+                </a>
+                <p className="mt-2 text-center text-xs text-muted">
+                  On iPhone, this opens your boarding pass in Wallet.
+                </p>
+                {isOwner && (
+                  <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
+                    <button type="submit" className="text-sm font-medium text-danger hover:underline">
+                      Remove pass
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
+            {ticket?.signedUrl && !ticketIsPdf && !ticketIsPass && (
               <>
                 <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block">
                   {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}

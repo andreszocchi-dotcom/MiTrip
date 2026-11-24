@@ -5,6 +5,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { formatDay } from "@/lib/dates";
+import { formatFlight, parseFlightNumber } from "@/lib/flights";
 import { createClient } from "@/lib/supabase/server";
 
 // The model is one setting so it's easy to switch (e.g. to "claude-sonnet-5-5").
@@ -25,7 +26,11 @@ const PlanSchema = z.object({
     .describe(
       "Something Google Maps can search: the street address if given, otherwise the place name plus city (e.g. 'PR1 Hotel, Sydney'). Null if there is no physical place.",
     ),
-  confirmation_number: z.string().nullable().describe("Booking reference or flight number, only if written in the itinerary"),
+  confirmation_number: z.string().nullable().describe("Booking reference, only if written in the itinerary"),
+  flight_number: z
+    .string()
+    .nullable()
+    .describe("For flights only: the airline code and number, like 'QF 1' or 'NZ 104', only if written in the itinerary"),
   notes: z.string().nullable().describe("Useful details and tips from the itinerary, kept short"),
 });
 
@@ -51,6 +56,12 @@ Rules:
 - List each day's plans in the order they happen, even when they have no time.
 - Return every trip date. Give each one a greeting in your own words that fits the day, like "Get excited!" on departure day or "Congrats, you landed!" on arrival day. Don't copy headings from the itinerary.
 - Give each day a one-sentence summary of what's coming, written to the traveler ("Tomorrow you take the early ferry to Manly.").`;
+
+// "qf001" -> "QF 1"; anything that isn't a flight number is dropped.
+function tidyFlight(text: string | null) {
+  const flight = parseFlightNumber(text);
+  return flight ? formatFlight(flight) : null;
+}
 
 export type ImportState =
   | { ok: true; planCount: number; dayCount: number; skippedDays: number; costUsd: number; inputTokens: number; outputTokens: number }
@@ -153,6 +164,7 @@ export async function importItinerary(tripId: number): Promise<ImportState> {
         end_time: time(plan.end_time),
         address: plan.address,
         confirmation_number: plan.confirmation_number,
+        flight_number: plan.type === "flight" ? tidyFlight(plan.flight_number) : null,
         notes: plan.notes,
       });
     }

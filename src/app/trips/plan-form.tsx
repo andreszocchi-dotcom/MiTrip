@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { FieldError, errorProps, inputClass } from "@/components/form-field";
 import { PLAN_TYPES } from "@/lib/plan-types";
 import type { PlanFormState } from "./plan-actions";
@@ -13,6 +13,7 @@ type Plan = {
   end_time: string | null;
   address: string | null;
   confirmation_number: string | null;
+  flight_number?: string | null;
   ticket_url: string | null;
   notes: string | null;
 };
@@ -36,6 +37,8 @@ export function PlanForm({
   const values = state?.values ?? plan;
   const errors = state?.errors ?? {};
   const hasErrors = Object.keys(errors).length > 0;
+  // The flight number field shows only for flights.
+  const [type, setType] = useState(values?.type ?? "activity");
 
   return (
     // noValidate: our own friendly messages replace the browser's pop-ups.
@@ -50,6 +53,7 @@ export function PlanForm({
                 name="type"
                 value={value}
                 defaultChecked={(values?.type ?? "activity") === value}
+                onChange={() => setType(value)}
                 className="peer sr-only"
               />
               <span className="flex items-center gap-1.5 rounded-full bg-background px-3.5 py-1.5 text-sm transition-colors peer-checked:bg-foreground peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
@@ -95,8 +99,27 @@ export function PlanForm({
         />
       </label>
 
+      {type === "flight" && (
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          Flight number <span className="font-normal text-muted">(optional)</span>
+          <span id="flight_number-help" className="font-normal text-muted">
+            For live status and a link to the airline, like QF 1 or NZ 104.
+          </span>
+          <input
+            name="flight_number"
+            defaultValue={values?.flight_number ?? ""}
+            placeholder="QF 1"
+            autoCapitalize="characters"
+            className={inputClass(!!errors.flight_number)}
+            {...errorProps("flight_number", errors.flight_number)}
+            aria-describedby={errors.flight_number ? "flight_number-error" : "flight_number-help"}
+          />
+          <FieldError id="flight_number-error" message={errors.flight_number} />
+        </label>
+      )}
+
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Confirmation or flight number <span className="font-normal text-muted">(optional)</span>
+        Confirmation number <span className="font-normal text-muted">(optional)</span>
         <input
           name="confirmation_number"
           defaultValue={values?.confirmation_number ?? ""}

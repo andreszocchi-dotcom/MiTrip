@@ -8,7 +8,8 @@ import { googleMapsUrl } from "@/lib/maps";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
-import { isPdfTicket } from "@/lib/tickets";
+import { airlineOf, flightOf, formatFlight } from "@/lib/flights";
+import { isPdfTicket, isWalletPass } from "@/lib/tickets";
 import { themeOf } from "@/lib/themes";
 
 export const metadata: Metadata = { title: "Save as PDF · MiTrip" };
@@ -85,8 +86,10 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                 // Photos print as they are; PDF tickets are drawn into images in
                 // the browser so they print too.
                 const pdfTicket = isPdfTicket(plan.ticket_image);
+                const walletPass = isWalletPass(plan.ticket_image);
+                const flight = flightOf(plan);
                 const ticketLink = plan.ticket_image ? ticketUrl.get(plan.ticket_image) : undefined;
-                const photo = pdfTicket ? undefined : ticketLink;
+                const photo = pdfTicket || walletPass ? undefined : ticketLink;
                 return (
                   <li key={plan.id} className="break-inside-avoid rounded-[12px] p-4 ring-1 ring-black/10">
                     <p className="text-sm text-muted">
@@ -101,6 +104,15 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                     </p>
                     <p className="mt-0.5 text-lg font-semibold">{plan.title}</p>
                     <dl className="mt-1 flex flex-col gap-0.5 text-sm">
+                      {flight && (
+                        <div>
+                          <dt className="inline text-muted">Flight: </dt>
+                          <dd className="inline font-medium">
+                            {formatFlight(flight)}
+                            {airlineOf(flight) && ` (${airlineOf(flight)!.name})`}
+                          </dd>
+                        </div>
+                      )}
                       {plan.confirmation_number && (
                         <div>
                           <dt className="inline text-muted">Confirmation: </dt>
@@ -129,6 +141,12 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                       )}
                     </dl>
                     {plan.notes && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{plan.notes}</p>}
+                    {walletPass && (
+                      <p className="mt-2 text-sm">
+                        <span className="font-medium">Boarding pass:</span>{" "}
+                        <span className="text-muted">saved for Apple Wallet. Add it from the plan in MiTrip.</span>
+                      </p>
+                    )}
                     {pdfTicket && ticketLink && (
                       <div className="mt-3 max-w-md">
                         <PdfTicketPages url={ticketLink} title={plan.title} maxPages={6} imgClassName="print:ring-0" />

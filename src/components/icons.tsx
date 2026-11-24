@@ -13,6 +13,9 @@ const PATHS = {
   pin: "M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11zM12 12.5a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5z",
   ticket: "M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V4H3zM14 4v16",
   hash: "M5 9h14M5 15h14M10 4L8 20M16 4l-2 16",
+  plane: "M10.5 21l1.5-1 1.5 1v-3l-1.5-1v-4.5l7.5 2.5v-2l-7.5-4.5V4a1.5 1.5 0 0 0-3 0v4.5L1.5 13v2l7.5-2.5V17L7.5 18v3l3-1z",
+  phone: "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM11 18h2",
+  wallet: "M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 9h16M4 12h16M16 15.5h1.5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

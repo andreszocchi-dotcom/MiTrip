@@ -24,10 +24,12 @@ export function TicketUpload({
 
   async function upload(file: File) {
     setError(undefined);
-    // Some phones report a PDF with no type, so the file name counts too.
+    // Some phones report a PDF or Wallet pass with no type, so the file
+    // name counts too.
     const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-    if (!isPdf && !file.type.startsWith("image/")) {
-      setError("Please choose a photo, screenshot, or PDF.");
+    const isPass = file.type === "application/vnd.apple.pkpass" || /\.pkpass$/i.test(file.name);
+    if (!isPdf && !isPass && !file.type.startsWith("image/")) {
+      setError("Please choose a photo, screenshot, PDF, or Apple Wallet pass.");
       return;
     }
     if (file.size > MAX_BYTES) {
@@ -35,11 +37,15 @@ export function TicketUpload({
       return;
     }
     setBusy(true);
-    const ext = isPdf ? "pdf" : (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ext = isPdf ? "pdf" : isPass ? "pkpass" : (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
     const path = `${tripId}/${planId}/${crypto.randomUUID()}.${ext}`;
+    // Browsers often don't know the .pkpass type (and some phones leave
+    // PDFs untyped), and the upload sends the file's own type, so relabel it.
+    const contentType = isPdf ? "application/pdf" : isPass ? "application/vnd.apple.pkpass" : file.type;
+    const labeled = file.type === contentType ? file : new File([file], file.name, { type: contentType });
     const { error: uploadError } = await createClient()
       .storage.from("tickets")
-      .upload(path, file, { contentType: isPdf ? "application/pdf" : file.type });
+      .upload(path, labeled, { contentType });
     const result = uploadError
       ? { error: "The upload didn't go through. Check your connection and try again." }
       : await saveTicketImage(tripId, planId, path);
@@ -53,7 +59,7 @@ export function TicketUpload({
       <input
         ref={input}
         type="file"
-        accept="image/*,application/pdf,.pdf"
+        accept="image/*,application/pdf,.pdf,application/vnd.apple.pkpass,.pkpass"
         className="sr-only"
         id={`ticket-${planId}`}
         disabled={busy}
@@ -67,7 +73,7 @@ export function TicketUpload({
         className="flex cursor-pointer items-center justify-center gap-2 rounded-[14px] border border-dashed border-accent/50 px-4 py-3.5 text-center text-base font-medium text-accent transition-colors hover:bg-accent-soft/50"
       >
         <Icon name="ticket" className="h-5 w-5" />
-        {busy ? "Uploading…" : hasTicket ? "Replace ticket" : "Add ticket (photo or PDF)"}
+        {busy ? "Uploading…" : hasTicket ? "Replace ticket" : "Add ticket (photo, PDF, or Wallet pass)"}
       </label>
       {error && (
         <p role="alert" className="mt-2 text-sm text-danger">
