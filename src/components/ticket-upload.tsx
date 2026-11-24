@@ -2,12 +2,13 @@
 
 import { useRef, useState } from "react";
 import { saveTicketImage } from "@/app/trips/ticket-actions";
+import { Icon } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 
 const MAX_BYTES = 10 * 1024 * 1024; // matches the bucket's 10 MB limit
 
-// "Add ticket photo" / "Replace photo": opens the phone's camera roll, then
-// uploads straight to the private tickets bucket.
+// "Add ticket" / "Replace ticket": picks a photo, screenshot, or PDF (like a
+// boarding pass) and uploads it straight to the private tickets bucket.
 export function TicketUpload({
   tripId,
   planId,
@@ -23,20 +24,22 @@ export function TicketUpload({
 
   async function upload(file: File) {
     setError(undefined);
-    if (!file.type.startsWith("image/")) {
-      setError("Please choose a photo or screenshot.");
+    // Some phones report a PDF with no type, so the file name counts too.
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+    if (!isPdf && !file.type.startsWith("image/")) {
+      setError("Please choose a photo, screenshot, or PDF.");
       return;
     }
     if (file.size > MAX_BYTES) {
-      setError("That photo is over 10 MB. Try a screenshot instead.");
+      setError("That file is over 10 MB. Try a screenshot instead.");
       return;
     }
     setBusy(true);
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ext = isPdf ? "pdf" : (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
     const path = `${tripId}/${planId}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await createClient()
       .storage.from("tickets")
-      .upload(path, file, { contentType: file.type });
+      .upload(path, file, { contentType: isPdf ? "application/pdf" : file.type });
     const result = uploadError
       ? { error: "The upload didn't go through. Check your connection and try again." }
       : await saveTicketImage(tripId, planId, path);
@@ -46,11 +49,11 @@ export function TicketUpload({
   }
 
   return (
-    <div className="mt-5">
+    <div className="mt-4">
       <input
         ref={input}
         type="file"
-        accept="image/*"
+        accept="image/*,application/pdf,.pdf"
         className="sr-only"
         id={`ticket-${planId}`}
         disabled={busy}
@@ -61,9 +64,10 @@ export function TicketUpload({
       />
       <label
         htmlFor={`ticket-${planId}`}
-        className="block cursor-pointer rounded-[12px] border border-dashed border-accent/50 px-4 py-3 text-center text-base font-medium text-accent"
+        className="flex cursor-pointer items-center justify-center gap-2 rounded-[14px] border border-dashed border-accent/50 px-4 py-3.5 text-center text-base font-medium text-accent transition-colors hover:bg-accent-soft/50"
       >
-        {busy ? "Uploading…" : hasTicket ? "Replace ticket photo" : "📷 Add ticket photo"}
+        <Icon name="ticket" className="h-5 w-5" />
+        {busy ? "Uploading…" : hasTicket ? "Replace ticket" : "Add ticket (photo or PDF)"}
       </label>
       {error && (
         <p role="alert" className="mt-2 text-sm text-red-700">
