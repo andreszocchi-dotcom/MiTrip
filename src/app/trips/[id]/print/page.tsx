@@ -7,6 +7,7 @@ import { googleMapsUrl } from "@/lib/maps";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
+import { isPdfTicket } from "@/lib/tickets";
 import { themeOf } from "@/lib/themes";
 
 export const metadata: Metadata = { title: "Save as PDF · MiTrip" };
@@ -80,7 +81,10 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
             <ul className="mt-3 flex flex-col gap-3">
               {day.plans.map((plan) => {
                 const type = planTypeOf(plan.type);
-                const photo = plan.ticket_image ? ticketUrl.get(plan.ticket_image) : undefined;
+                // A PDF ticket can't be drawn into the printed page, so it gets a
+                // note (and a link, which works in the saved PDF while online).
+                const pdfTicket = isPdfTicket(plan.ticket_image);
+                const photo = plan.ticket_image && !pdfTicket ? ticketUrl.get(plan.ticket_image) : undefined;
                 return (
                   <li key={plan.id} className="break-inside-avoid rounded-[12px] p-4 ring-1 ring-black/10">
                     <p className="text-sm text-muted">
@@ -123,6 +127,12 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                       )}
                     </dl>
                     {plan.notes && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{plan.notes}</p>}
+                    {pdfTicket && (
+                      <p className="mt-2 text-sm">
+                        <span className="font-medium">Ticket PDF:</span>{" "}
+                        <span className="text-muted">saved in MiTrip on this plan. Download it before you lose signal.</span>
+                      </p>
+                    )}
                     {photo && (
                       // eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link
                       <img

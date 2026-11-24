@@ -235,7 +235,7 @@ export default function Home() {
               <BentoTile
                 className="h-full"
                 title="Tickets, on hand."
-                text="Snap a photo of a ticket and keep it with its plan."
+                text="Add a photo or PDF of any ticket and keep it with its plan."
               >
                 <div aria-hidden="true" className="flex w-44 overflow-hidden rounded-[12px] bg-background text-xs">
                   <div className="flex-1 border-r-2 border-dashed border-line p-3">

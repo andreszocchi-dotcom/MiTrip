@@ -11,6 +11,7 @@ import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
+import { isPdfTicket } from "@/lib/tickets";
 import { deletePlan } from "../../../plan-actions";
 import { removeTicketImage } from "../../../ticket-actions";
 
@@ -40,7 +41,9 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   const isOwner = day.trips?.owner_id === user.id;
   const dayHref = `/trips/${day.trip_id}/days/${day.id}`;
 
-  // Ticket photos are private; a signed link lets this page show one for an hour.
+  // Tickets (photos or PDFs) are private; a signed link lets this page show
+  // or open one for an hour.
+  const ticketIsPdf = isPdfTicket(plan.ticket_image);
   const { data: ticket } = plan.ticket_image
     ? await supabase.storage.from("tickets").createSignedUrl(plan.ticket_image, 60 * 60)
     : { data: null };
@@ -133,8 +136,37 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
 
         {(ticket?.signedUrl || isOwner) && (
           <section className="tile mt-4 p-6">
-            <p className="text-[13px] text-muted">Ticket photo</p>
-            {ticket?.signedUrl && (
+            <p className="text-[13px] text-muted">Ticket</p>
+            {ticket?.signedUrl && ticketIsPdf && (
+              <>
+                <a
+                  href={ticket.signedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 flex items-center gap-4 rounded-[16px] bg-background p-4 transition-colors hover:bg-black/[0.05]"
+                >
+                  <span
+                    className="flex h-14 w-11 shrink-0 items-center justify-center rounded-[8px] bg-surface text-[11px] font-bold tracking-wide"
+                    style={{ color: theme.strong }}
+                  >
+                    PDF
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">Ticket for {plan.title}</span>
+                    <span className="block text-sm text-muted">Opens in a new tab</span>
+                  </span>
+                  <span className="link text-sm">Open ↗</span>
+                </a>
+                {isOwner && (
+                  <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
+                    <button type="submit" className="text-sm font-medium text-red-700 hover:underline">
+                      Remove ticket
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
+            {ticket?.signedUrl && !ticketIsPdf && (
               <>
                 <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block">
                   {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}
@@ -148,7 +180,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                 {isOwner && (
                   <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
                     <button type="submit" className="text-sm font-medium text-red-700 hover:underline">
-                      Remove photo
+                      Remove ticket
                     </button>
                   </form>
                 )}
