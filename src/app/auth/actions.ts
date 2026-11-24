@@ -5,6 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 
 export type AuthFormState = { error?: string; email?: string } | undefined;
 
+// Where to go after logging in or signing up: the "next" page from the
+// address (like an invite link), but only paths on this site.
+function nextPath(formData: FormData) {
+  const next = String(formData.get("next") ?? "");
+  return next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "/trips";
+}
+
 function readCredentials(formData: FormData) {
   return {
     email: String(formData.get("email") ?? "").trim(),
@@ -38,7 +45,7 @@ export async function signUp(
   if (!data.session) {
     return { error: "Check your email to confirm your account, then log in.", email };
   }
-  redirect("/trips");
+  redirect(nextPath(formData));
 }
 
 export async function logIn(
@@ -58,7 +65,7 @@ export async function logIn(
       email,
     };
   }
-  redirect("/trips");
+  redirect(nextPath(formData));
 }
 
 export async function logOut() {

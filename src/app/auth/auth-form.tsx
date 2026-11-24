@@ -24,7 +24,7 @@ const COPY = {
   },
 };
 
-export function AuthForm({ mode }: { mode: "signup" | "login" }) {
+export function AuthForm({ mode, next }: { mode: "signup" | "login"; next?: string }) {
   const [state, formAction, pending] = useActionState(
     mode === "signup" ? signUp : logIn,
     undefined,
@@ -38,8 +38,8 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
         <h1 className="headline mt-6">{copy.title}</h1>
       </div>
       <div className="tile mt-8 p-6 sm:p-8">
-
-        <form action={formAction} className="mt-6 flex flex-col gap-4" noValidate>
+        <form action={formAction} className="flex flex-col gap-4" noValidate>
+          {next && <input type="hidden" name="next" value={next} />}
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             Email
             <input
@@ -78,7 +78,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
       </div>
       <p className="mt-6 text-center text-sm text-muted">
         {copy.switchText}{" "}
-        <Link href={copy.switchHref} className="link">
+        <Link href={next ? `${copy.switchHref}?next=${encodeURIComponent(next)}` : copy.switchHref} className="link">
           {copy.switchLink} ›
         </Link>
       </p>

@@ -232,6 +232,7 @@ export type Database = {
           end_date: string
           google_maps_list_url: string | null
           id: number
+          invite_code: string | null
           itinerary_text: string | null
           name: string
           owner_id: string
@@ -243,6 +244,7 @@ export type Database = {
           end_date: string
           google_maps_list_url?: string | null
           id?: never
+          invite_code?: string | null
           itinerary_text?: string | null
           name: string
           owner_id?: string
@@ -254,6 +256,7 @@ export type Database = {
           end_date?: string
           google_maps_list_url?: string | null
           id?: never
+          invite_code?: string | null
           itinerary_text?: string | null
           name?: string
           owner_id?: string
@@ -296,7 +299,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      join_trip: {
+        Args: { p_code: string }
+        Returns: number | null
+      }
+      trip_people: {
+        Args: { p_trip_id: number }
+        Returns: {
+          email: string
+          role: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
