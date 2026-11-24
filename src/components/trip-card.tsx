@@ -4,7 +4,7 @@ import { TodayLink } from "@/components/today-link";
 import { TripCountdown } from "@/components/trip-countdown";
 import { SceneBanner } from "@/components/trip-scene";
 import { countDays, formatDateRange } from "@/lib/dates";
-import { themeOf } from "@/lib/themes";
+import { T, themeOf, tripScope } from "@/lib/themes";
 
 export type TripCardTrip = {
   id: number;
@@ -31,12 +31,13 @@ export function TripCard({
   feature?: boolean;
 }) {
   const theme = themeOf(trip.theme);
+  const scope = tripScope(theme);
   return (
-    <li className="relative list-none">
+    <li className={`relative list-none ${scope.className}`} style={scope.style}>
       <Link
         href={`/trips/${trip.id}`}
         className="group block overflow-hidden rounded-[28px] transition-transform duration-300 active:scale-[0.99]"
-        style={{ backgroundColor: theme.sky, color: theme.ink }}
+        style={{ backgroundColor: T.sky, color: T.ink }}
       >
         <div className={feature ? "px-7 pb-2 pt-8 sm:px-12 sm:pt-12" : "px-6 pb-1 pt-6 sm:px-7 sm:pt-7"}>
           <p className="eyebrow opacity-80">
@@ -59,7 +60,7 @@ export function TripCard({
         <SceneBanner
           theme={trip.theme}
           uid={`card-${trip.id}`}
-          sky={theme.sky}
+          sky={T.sky}
           className={`transition-transform duration-700 group-hover:scale-[1.02] ${feature ? "aspect-[2/1] min-h-56 sm:aspect-[2.6/1]" : "aspect-[2/1] min-h-40"}`}
         />
       </Link>
@@ -68,7 +69,7 @@ export function TripCard({
           <StarButton tripId={trip.id} starred={starred} size="icon" />
         </div>
       )}
-      {trip.days && <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} timezone={trip.timezone} />}
+      {trip.days && <TodayLink tripId={trip.id} days={trip.days} color={T.strong} timezone={trip.timezone} />}
     </li>
   );
 }

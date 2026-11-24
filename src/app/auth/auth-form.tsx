@@ -47,7 +47,7 @@ export function AuthForm({
       </div>
       <div className="tile mt-8 p-6 sm:p-8">
         {notice && (
-          <p role="alert" className="mb-5 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p role="alert" className="mb-5 rounded-[12px] bg-danger-bg px-4 py-3 text-sm text-danger">
             {notice}
           </p>
         )}
@@ -89,7 +89,7 @@ export function AuthForm({
           </label>
 
           {state?.error && (
-            <p role="alert" className="rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+            <p role="alert" className="rounded-[12px] bg-danger-bg px-4 py-3 text-sm text-danger">
               {state.error}
             </p>
           )}

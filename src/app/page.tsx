@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Reveal } from "@/components/reveal";
 import { TripScene } from "@/components/trip-scene";
-import { THEMES } from "@/lib/themes";
+import { T, THEMES, tripScope } from "@/lib/themes";
 
 // Sample day shown in the phone on the landing page: what a day in MiTrip
 // looks like, with each plan's buttons (Maps, ticket, star) visible.
@@ -14,17 +14,17 @@ const SAMPLE_PLANS = [
 ];
 
 function PhoneMock() {
-  const ocean = THEMES.ocean;
+  const ocean = tripScope(THEMES.ocean);
   return (
     <div className="mx-auto w-[300px] rounded-[48px] bg-ink p-3 text-left sm:w-[340px]">
-      <div className="relative h-[600px] overflow-hidden rounded-[38px] bg-background sm:h-[660px]">
+      <div className={`relative h-[600px] overflow-hidden rounded-[38px] bg-background sm:h-[660px] ${ocean.className}`} style={ocean.style}>
         <div className="flex justify-center pt-3">
           <div className="h-6 w-24 rounded-full bg-ink" />
         </div>
         <div className="px-3 pt-3">
           {/* Day header */}
-          <div className="rounded-[20px] px-4 py-3.5" style={{ backgroundColor: ocean.soft }}>
-            <p className="text-[10px] font-semibold" style={{ color: ocean.strong }}>
+          <div className="rounded-[20px] px-4 py-3.5" style={{ backgroundColor: T.soft }}>
+            <p className="text-[10px] font-semibold" style={{ color: T.strong }}>
               Day 3 of 14 · Today
             </p>
             <p className="mt-0.5 text-[20px] font-semibold leading-tight tracking-[-0.02em]">Sun, Jan 10</p>
@@ -63,11 +63,11 @@ function PhoneMock() {
                     Open ticket ↗
                   </div>
                 )}
-                <div className="flex border-t border-black/[0.06] text-[10px] font-medium">
-                  <span className={`flex-1 py-1.5 text-center ${plan.starred ? "text-amber-600" : "text-muted"}`}>
+                <div className="flex border-t border-foreground/[0.06] text-[10px] font-medium">
+                  <span className={`flex-1 py-1.5 text-center ${plan.starred ? "text-amber-600 dark:text-amber-300" : "text-muted"}`}>
                     {plan.starred ? "★ Starred" : "☆ Star"}
                   </span>
-                  <span className="flex-[2] border-l border-black/[0.06] py-1.5 text-center text-accent">
+                  <span className="flex-[2] border-l border-foreground/[0.06] py-1.5 text-center text-accent">
                     Open in Google Maps ↗
                   </span>
                 </div>
@@ -214,8 +214,8 @@ export default function Home() {
             {Object.entries(THEMES).map(([key, theme]) => (
               <li
                 key={key}
-                className="w-[260px] shrink-0 snap-center overflow-hidden rounded-[28px] lg:w-auto"
-                style={{ backgroundColor: theme.sky, color: theme.ink }}
+                className={`w-[260px] shrink-0 snap-center overflow-hidden rounded-[28px] lg:w-auto ${tripScope(theme).className}`}
+                style={{ ...tripScope(theme).style, backgroundColor: T.sky, color: T.ink }}
               >
                 <p className="px-6 pt-6 text-[21px] font-semibold tracking-[-0.02em]">{theme.label}</p>
                 <div className="relative mt-2 aspect-[4/5] w-full">

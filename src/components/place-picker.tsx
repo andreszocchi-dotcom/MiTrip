@@ -80,7 +80,7 @@ export function PlacePicker({
         />
       )}
       {!place && showList && (
-        <ul className="absolute inset-x-0 top-full z-20 mt-1.5 overflow-hidden rounded-[14px] bg-surface shadow-[0_8px_30px_rgb(0_0_0/0.12)] ring-1 ring-black/5">
+        <ul className="absolute inset-x-0 top-full z-20 mt-1.5 overflow-hidden rounded-[14px] bg-surface shadow-[0_8px_30px_rgb(0_0_0/0.12)] ring-1 ring-foreground/5">
           {results.length > 0 ? (
             results.map((r) => (
               <li key={`${r.latitude},${r.longitude}`}>

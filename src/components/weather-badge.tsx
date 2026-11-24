@@ -76,7 +76,7 @@ export function WeatherBadge({
       type="button"
       onClick={toggleUnit}
       title="Tap to switch °C/°F"
-      className={`inline-flex items-center gap-2 rounded-full bg-white/55 px-4 py-1.5 text-[15px] backdrop-blur transition-colors hover:bg-white/75 ${className}`}
+      className={`inline-flex items-center gap-2 rounded-full bg-white/55 px-4 py-1.5 text-[15px] backdrop-blur transition-colors hover:bg-white/75 dark:bg-white/10 dark:hover:bg-white/15 ${className}`}
     >
       <span aria-hidden="true" className="text-lg">
         {icon}

@@ -161,7 +161,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
               showTicket
               context={{
                 text: `${plan.days.trips.name} · ${formatDay(plan.days.date)}${plan.start_time ? ` · ${formatTime(plan.start_time)}` : ""}`,
-                color: themeOf(plan.days.trips.theme).strong,
+                theme: themeOf(plan.days.trips.theme),
               }}
             />
           ))}

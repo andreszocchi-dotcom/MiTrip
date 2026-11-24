@@ -17,7 +17,7 @@ import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { placeOf, placesForDays, shortPlace } from "@/lib/places";
 import { weatherForDays } from "@/lib/weather";
 import { createClient } from "@/lib/supabase/server";
-import { themeOf } from "@/lib/themes";
+import { T, themeOf, tripScope } from "@/lib/themes";
 import { deleteTrip } from "../actions";
 import { ImportButton } from "./import-button";
 import { People } from "./people";
@@ -53,7 +53,7 @@ function ActionTile({
       <span className="mt-0.5 block text-sm text-muted">{text}</span>
     </>
   );
-  const className = "tile block p-6 transition-colors hover:bg-white/70 active:scale-[0.99]";
+  const className = "tile block p-6 transition-colors hover:bg-foreground/[0.03] active:scale-[0.99]";
   return external ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {inner}
@@ -93,6 +93,8 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const { data: people } = await supabase.rpc("trip_people", { p_trip_id: trip.id });
 
   const theme = themeOf(trip.theme);
+
+  const scope = tripScope(theme);
   const isOwner = trip.owner_id === user.id;
   const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
   const dayCount = countDays(trip.start_date, trip.end_date);
@@ -107,7 +109,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const dayWeather = await weatherForDays(trip.days.map((d, i) => ({ date: d.date, place: dayPlaces[i] })));
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className={`flex flex-1 flex-col ${scope.className}`} style={scope.style}>
       <SubNav title={trip.name} href={`/trips/${trip.id}`}>
         <a href="#days" className="hidden text-foreground/70 hover:text-foreground sm:inline">
           Days
@@ -125,7 +127,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
       </SubNav>
 
       {/* Hero: the trip's name on its own sky, the full scene below. */}
-      <section style={{ backgroundColor: theme.sky, color: theme.ink }}>
+      <section style={{ backgroundColor: T.sky, color: T.ink }}>
         <div className="mx-auto max-w-[980px] px-4 pt-14 text-center sm:pt-24">
           <p className="eyebrow opacity-80">
             <TripCountdown start={trip.start_date} end={trip.end_date} timezone={trip.timezone} />
@@ -147,13 +149,13 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
         <SceneBanner
           theme={trip.theme}
           uid={`hero-${trip.id}`}
-          sky={theme.sky}
+          sky={T.sky}
           className="mt-8 aspect-[2/1] max-h-[620px] min-h-64 sm:mt-4"
         />
       </section>
 
       <div className="page !pt-10">
-        <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} timezone={trip.timezone} />
+        <TodayLink tripId={trip.id} days={trip.days} color={T.strong} timezone={trip.timezone} />
 
         {/* Quick actions */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
@@ -162,14 +164,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             icon="doc"
             title="Save as PDF"
             text="For when there's no signal"
-            color={theme.strong}
+            color={T.strong}
           />
           <ActionTile
             href={`/search?trip=${trip.id}`}
             icon="search"
             title="Search"
             text={`${totalPlans} ${totalPlans === 1 ? "plan" : "plans"} in this trip`}
-            color={theme.strong}
+            color={T.strong}
           />
           {trip.google_maps_list_url && (
             <ActionTile
@@ -178,7 +180,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
               title="Maps list"
               text="Your saved places"
               external
-              color={theme.strong}
+              color={T.strong}
             />
           )}
           <ActionTile
@@ -186,7 +188,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             icon="people"
             title={isOwner ? "Share" : "People"}
             text={isOwner ? "Invite someone to view" : `${(people ?? []).length} on this trip`}
-            color={theme.strong}
+            color={T.strong}
           />
         </div>
 
@@ -202,10 +204,10 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             <DayStrip
               tripId={trip.id}
               days={trip.days.map((d) => ({ id: d.id, date: d.date, planCount: d.plans[0]?.count ?? 0 }))}
-              color={theme.strong}
+              color={T.strong}
             />
           </div>
-          <ul className="tile mt-4 divide-y divide-black/[0.06] overflow-hidden">
+          <ul className="tile mt-4 divide-y divide-foreground/[0.06] overflow-hidden">
             {trip.days.map((day, index) => {
               const planCount = day.plans[0]?.count ?? 0;
               const weather = dayWeather[index];
@@ -216,11 +218,11 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
                 <li key={day.id}>
                   <Link
                     href={`/trips/${trip.id}/days/${day.id}`}
-                    className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-black/[0.02] active:bg-black/[0.04] sm:px-6"
+                    className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-foreground/[0.02] active:bg-foreground/[0.04] sm:px-6"
                   >
                     <span
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold tabular-nums"
-                      style={{ backgroundColor: theme.soft, color: theme.ink }}
+                      style={{ backgroundColor: T.soft, color: T.ink }}
                     >
                       {index + 1}
                     </span>

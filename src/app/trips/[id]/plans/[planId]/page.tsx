@@ -11,7 +11,7 @@ import { formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
-import { themeOf } from "@/lib/themes";
+import { T, themeOf, tripScope } from "@/lib/themes";
 import { isPdfTicket } from "@/lib/tickets";
 import { deletePlan } from "../../../plan-actions";
 import { removeTicketImage } from "../../../ticket-actions";
@@ -50,6 +50,8 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
     : { data: null };
 
   const theme = themeOf(day.trips?.theme ?? "ocean");
+
+  const scope = tripScope(theme);
   const details: { label: string; value: string; icon: IconName; href?: string }[] = [];
   if (plan.address) {
     details.push({ label: "Where", icon: "pin", value: plan.address, href: googleMapsUrl(plan.address) });
@@ -62,7 +64,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   }
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className={`flex flex-1 flex-col ${scope.className}`} style={scope.style}>
       <SubNav title={day.trips?.name ?? "Trip"} href={`/trips/${day.trip_id}`}>
         <Link href={dayHref} className="text-foreground/70 hover:text-foreground">
           ‹ {formatDay(day.date)}
@@ -73,12 +75,12 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
         <header className="pb-10 pt-4 text-center sm:pt-8">
           <span
             className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-4xl"
-            style={{ backgroundColor: theme.soft }}
+            style={{ backgroundColor: T.soft }}
             aria-hidden="true"
           >
             {type.icon}
           </span>
-          <p className="eyebrow mt-6" style={{ color: theme.strong }}>
+          <p className="eyebrow mt-6" style={{ color: T.strong }}>
             {type.label} · {formatDay(day.date)}
           </p>
           <h1 className="headline-lg mt-2 text-balance">{plan.title}</h1>
@@ -94,11 +96,11 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
         </header>
 
         {details.length > 0 && (
-          <ul className="tile divide-y divide-black/[0.06] overflow-hidden">
+          <ul className="tile divide-y divide-foreground/[0.06] overflow-hidden">
             {details.map((d) => {
               const row = (
                 <>
-                  <span style={{ color: theme.strong }}>
+                  <span style={{ color: T.strong }}>
                     <Icon name={d.icon} className="h-6 w-6" />
                   </span>
                   <span className="min-w-0 flex-1">
@@ -115,7 +117,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                       href={d.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-black/[0.02]"
+                      className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-foreground/[0.02]"
                     >
                       {row}
                     </a>
@@ -147,11 +149,11 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                   href={ticket.signedUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 flex items-center gap-4 rounded-[16px] bg-background p-4 transition-colors hover:bg-black/[0.05]"
+                  className="mt-3 flex items-center gap-4 rounded-[16px] bg-background p-4 transition-colors hover:bg-foreground/[0.05]"
                 >
                   <span
                     className="flex h-14 w-11 shrink-0 items-center justify-center rounded-[8px] bg-surface text-[11px] font-bold tracking-wide"
-                    style={{ color: theme.strong }}
+                    style={{ color: T.strong }}
                   >
                     PDF
                   </span>
@@ -163,7 +165,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                 </a>
                 {isOwner && (
                   <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
-                    <button type="submit" className="text-sm font-medium text-red-700 hover:underline">
+                    <button type="submit" className="text-sm font-medium text-danger hover:underline">
                       Remove ticket
                     </button>
                   </form>
@@ -183,7 +185,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
                 <p className="mt-2 text-center text-xs text-muted">Tap to open full size</p>
                 {isOwner && (
                   <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
-                    <button type="submit" className="text-sm font-medium text-red-700 hover:underline">
+                    <button type="submit" className="text-sm font-medium text-danger hover:underline">
                       Remove ticket
                     </button>
                   </form>

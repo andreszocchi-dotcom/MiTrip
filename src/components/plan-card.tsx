@@ -3,6 +3,7 @@ import { StarButton } from "@/components/star-button";
 import { formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
+import { T, tripScope, type Theme } from "@/lib/themes";
 
 export type PlanCardPlan = {
   id: number;
@@ -29,20 +30,20 @@ export function PlanCard({
   href: string;
   starred: boolean;
   // Optional line above the title, e.g. "Honeymoon · Sun, Jan 10 · 3:30 PM".
-  context?: { text: string; color: string };
+  context?: { text: string; theme: Theme };
   showTicket?: boolean;
 }) {
   const type = planTypeOf(plan.type);
   return (
-    <li className="relative">
+    <li className={`relative ${context ? tripScope(context.theme).className : ""}`} style={context ? tripScope(context.theme).style : undefined}>
       <div className="tile overflow-hidden">
-      <Link href={href} className="flex gap-4 p-6 transition-colors hover:bg-black/[0.015] active:bg-black/[0.03]">
+      <Link href={href} className="flex gap-4 p-6 transition-colors hover:bg-foreground/[0.015] active:bg-foreground/[0.03]">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-background text-xl" aria-hidden="true">
           {type.icon}
         </span>
         <div className="min-w-0 flex-1">
           {context ? (
-            <p className="text-[13px] font-semibold" style={{ color: context.color }}>
+            <p className="text-[13px] font-semibold" style={{ color: T.strong }}>
               {context.text}
             </p>
           ) : (
@@ -80,7 +81,7 @@ export function PlanCard({
           Open ticket ↗
         </a>
       )}
-      <div className="flex divide-x divide-black/[0.06] border-t border-black/[0.06]">
+      <div className="flex divide-x divide-foreground/[0.06] border-t border-foreground/[0.06]">
         <div className="flex-1">
           <StarButton planId={plan.id} starred={starred} />
         </div>

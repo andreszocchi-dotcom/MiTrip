@@ -53,11 +53,21 @@ export function TodayLink({
 }
 
 // "Today" badge on the day page when that day is today (in its own city).
-export function TodayBadge({ date, color, timezone }: { date: string; color: string; timezone?: string | null }) {
+export function TodayBadge({
+  date,
+  color,
+  textColor = "white",
+  timezone,
+}: {
+  date: string;
+  color: string;
+  textColor?: string;
+  timezone?: string | null;
+}) {
   const today = useTodayIn(timezone);
   if (date !== today) return null;
   return (
-    <span className="ml-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: color }}>
+    <span className="ml-2 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ backgroundColor: color, color: textColor }}>
       Today
     </span>
   );

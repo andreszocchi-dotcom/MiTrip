@@ -6,7 +6,7 @@ import { FieldError, errorProps, inputClass } from "@/components/form-field";
 import { PlacePicker } from "@/components/place-picker";
 import { TripScene } from "@/components/trip-scene";
 import { placeOf } from "@/lib/places";
-import { THEMES } from "@/lib/themes";
+import { T, THEMES, tripScope } from "@/lib/themes";
 import type { TripFormState } from "./actions";
 
 type Trip = {
@@ -94,7 +94,7 @@ export function TripForm({
         <p className="text-sm text-muted">Sets the trip&apos;s color and the picture on its pages.</p>
         <div className="mt-2 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
           {Object.entries(THEMES).map(([value, theme]) => (
-            <label key={value} className="cursor-pointer">
+            <label key={value} className={`cursor-pointer ${tripScope(theme).className}`} style={tripScope(theme).style}>
               <input
                 type="radio"
                 name="theme"
@@ -104,13 +104,13 @@ export function TripForm({
               />
               <span
                 className="block overflow-hidden rounded-[16px] ring-offset-2 transition-shadow peer-checked:ring-[3px] peer-checked:ring-[var(--ring)] peer-focus-visible:ring-[3px] peer-focus-visible:ring-accent"
-                style={{ ["--ring" as string]: theme.strong }}
+                style={{ ["--ring" as string]: T.strong }}
               >
                 <span className="relative block aspect-[4/3]">
                   <TripScene theme={value} uid={`pick-${value}`} animated={false} className="absolute inset-0 h-full w-full" />
                 </span>
               </span>
-              <span className="mt-1.5 block text-center text-[13px] font-medium" style={{ color: theme.ink }}>
+              <span className="mt-1.5 block text-center text-[13px] font-medium" style={{ color: T.ink }}>
                 {theme.label}
               </span>
             </label>
@@ -156,7 +156,7 @@ export function TripForm({
       </label>
 
       {(hasErrors || state?.error) && (
-        <p role="alert" className="rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-[12px] bg-danger-bg px-4 py-3 text-sm text-danger">
           {state?.error ?? "Almost there. Fix the fields marked in red above."}
         </p>
       )}

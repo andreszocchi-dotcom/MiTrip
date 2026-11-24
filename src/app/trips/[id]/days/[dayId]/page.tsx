@@ -19,7 +19,7 @@ import { forecastFor } from "@/lib/weather";
 import { planTypeOf } from "@/lib/plan-types";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { createClient } from "@/lib/supabase/server";
-import { themeOf } from "@/lib/themes";
+import { T, themeOf, tripScope } from "@/lib/themes";
 
 export const metadata: Metadata = { title: "Day · MiTrip" };
 
@@ -75,6 +75,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const trip = day.trips;
   const plans = sortPlansByTime(day.plans);
   const theme = themeOf(trip.theme);
+  const scope = tripScope(theme);
   const isOwner = trip.owner_id === user.id;
   const stops = routeStops(plans);
   const routeLinks = dayRouteLinks(stops);
@@ -113,7 +114,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   );
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className={`flex flex-1 flex-col ${scope.className}`} style={scope.style}>
       <SubNav title={trip.name} href={`/trips/${trip.id}`}>
         {prevId ? (
           <Link href={dayHref(prevId)} className="text-foreground/70 hover:text-foreground" aria-label="Previous day">
@@ -134,11 +135,11 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         )}
       </SubNav>
 
-      <section style={{ backgroundColor: theme.sky, color: theme.ink }}>
+      <section style={{ backgroundColor: T.sky, color: T.ink }}>
         <div className="mx-auto max-w-[980px] px-4 pt-12 text-center sm:pt-20">
           <p className="eyebrow opacity-80">
             Day {index + 1}
-            <TodayBadge date={day.date} color={theme.ink} timezone={place?.timezone} />
+            <TodayBadge date={day.date} color={T.ink} textColor={T.sky} timezone={place?.timezone} />
           </p>
           <h1 className="headline-xl mt-2">{formatDay(day.date)}</h1>
           {day.greeting && (
@@ -167,13 +168,13 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         <SceneBanner
           theme={trip.theme}
           uid={`day-${day.id}`}
-          sky={theme.sky}
+          sky={T.sky}
           className="mt-6 aspect-[3/1] max-h-[420px] min-h-48"
         />
       </section>
 
       <div className="page !pt-8">
-        <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
+        <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={T.strong} />
 
         {/* Today's route, as its own dark moment */}
         {routeLinks.length > 0 && (
@@ -189,8 +190,8 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
               {stopPlans.map((plan, i) => (
                 <li key={plan.id} className="relative flex items-center gap-4">
                   <span
-                    className="z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold"
-                    style={{ backgroundColor: theme.sky, color: theme.ink }}
+                    className="z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white dark:text-black"
+                    style={{ backgroundColor: T.strong }}
                   >
                     {i + 1}
                   </span>
@@ -229,7 +230,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
         {plans.length > 0 ? (
           <ul
             className="relative mt-6 flex flex-col gap-3 pl-7 before:absolute before:bottom-6 before:left-[9px] before:top-6 before:w-0.5 before:rounded-full before:bg-[var(--line-color)] [&>li]:relative [&>li]:before:absolute [&>li]:before:-left-[26px] [&>li]:before:top-7 [&>li]:before:h-3.5 [&>li]:before:w-3.5 [&>li]:before:rounded-full [&>li]:before:border-[3px] [&>li]:before:border-background [&>li]:before:bg-[var(--dot-color)] [&>li]:before:content-['']"
-            style={{ ["--line-color" as string]: theme.soft, ["--dot-color" as string]: theme.strong }}
+            style={{ ["--line-color" as string]: T.soft, ["--dot-color" as string]: T.strong }}
           >
             {plans.map((plan) => (
               <PlanCard
@@ -253,9 +254,9 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
           <Link
             href={dayHref(nextDay.id)}
             className="mt-16 block rounded-[28px] p-7 transition-transform active:scale-[0.99] sm:p-9"
-            style={{ backgroundColor: theme.soft }}
+            style={{ backgroundColor: T.soft }}
           >
-            <p className="eyebrow" style={{ color: theme.strong }}>
+            <p className="eyebrow" style={{ color: T.strong }}>
               <NextDayLabel date={day.date} timezone={place?.timezone} /> · {formatDay(nextDay.date)}
             </p>
             {nextDay.summary && <p className="mt-2 text-[21px] font-semibold tracking-[-0.02em]">{nextDay.summary}</p>}
@@ -275,7 +276,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
             ) : (
               !nextDay.summary && <p className="mt-2 text-muted">Nothing planned yet.</p>
             )}
-            <p className="mt-5 font-medium" style={{ color: theme.strong }}>
+            <p className="mt-5 font-medium" style={{ color: T.strong }}>
               See the full day ›
             </p>
           </Link>
