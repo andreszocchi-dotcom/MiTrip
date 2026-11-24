@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logOut } from "@/app/auth/actions";
+import { AppearanceSwitch } from "@/components/appearance-switch";
 import { APP_LINKS, PUBLIC_PATHS } from "@/components/site-nav";
 
 // Small, quiet footer: link columns on light gray.
@@ -57,7 +58,11 @@ export function SiteFooter() {
               </div>
             </div>
           )}
-          <p className="mt-8 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
+          <div className="mt-8 flex items-center justify-between gap-3 border-t border-line pt-4">
+            <span>Appearance</span>
+            <AppearanceSwitch />
+          </div>
+          <p className="mt-4 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
             <span>MiTrip · Made for the trip, one day at a time.</span>
             <span>
               Weather by{" "}
