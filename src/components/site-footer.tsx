@@ -57,7 +57,12 @@ export function SiteFooter() {
               </div>
             </div>
           )}
-          <p className="mt-8 border-t border-line pt-4">MiTrip · Made for the trip, one day at a time.</p>
+          <p className="mt-8 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
+            <span>MiTrip · Made for the trip, one day at a time.</span>
+            <Link href="/privacy" className="hover:text-foreground hover:underline">
+              Privacy
+            </Link>
+          </p>
         </div>
       </div>
     </footer>
