@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { PlanCard } from "@/components/plan-card";
 import { formatDay, formatTime } from "@/lib/dates";
 import { PLAN_TYPES } from "@/lib/plan-types";
@@ -60,16 +59,14 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
   );
 
   const hasFilters = Boolean(q || type || tripFilter);
-  const fieldClass =
-    "rounded-xl border border-black/10 bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft";
+  const fieldClass = "field !py-2.5 !text-[15px]";
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <h1 className="mt-8 text-3xl font-semibold">Search</h1>
+    <main className="page">
+      <h1 className="headline">Search</h1>
 
       {/* A plain GET form: submitting it just updates the page address. */}
-      <form action="/search" className="mt-5 flex flex-col gap-3">
+      <form action="/search" className="mt-8 flex flex-col gap-4">
         <div className="flex gap-2">
           <input
             name="q"
@@ -77,9 +74,9 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
             defaultValue={q}
             placeholder="Search titles, places, notes"
             aria-label="Search plans"
-            className={`${fieldClass} flex-1 text-base`}
+            className="field flex-1"
           />
-          <button type="submit" className="rounded-xl bg-accent px-4 text-sm font-medium text-white">
+          <button type="submit" className="btn btn-primary btn-sm">
             Search
           </button>
         </div>
@@ -96,7 +93,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
                   defaultChecked={type === value || (!(type in PLAN_TYPES) && value === "")}
                   className="peer sr-only"
                 />
-                <span className="flex items-center gap-1 rounded-full bg-surface px-3 py-1.5 text-sm ring-1 ring-black/10 peer-checked:bg-accent-soft peer-checked:text-accent peer-checked:ring-2 peer-checked:ring-accent">
+                <span className="flex items-center gap-1 rounded-full bg-surface px-3.5 py-1.5 text-sm transition-colors peer-checked:bg-foreground peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
                   {t.icon && <span aria-hidden="true">{t.icon}</span>}
                   {t.label}
                 </span>
@@ -130,7 +127,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
         </div>
         <button
           type="submit"
-          className="rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-medium text-accent"
+          className="btn btn-secondary btn-sm"
         >
           Apply filters
         </button>
@@ -142,14 +139,14 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
           {hasFilters && " found"}
         </p>
         {hasFilters && (
-          <Link href="/search" className="text-sm font-medium text-accent">
+          <Link href="/search" className="link text-sm">
             Clear
           </Link>
         )}
       </div>
 
       {plans.length > 0 ? (
-        <ul className="mt-3 flex flex-col gap-3">
+        <ul className="mt-4 flex flex-col gap-3">
           {plans.map((plan) => (
             <PlanCard
               key={plan.id}
@@ -165,7 +162,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
           ))}
         </ul>
       ) : (
-        <div className="mt-3 rounded-2xl bg-surface p-8 text-center shadow-sm ring-1 ring-black/5">
+        <div className="tile mt-4 p-10 text-center">
           <p className="font-medium">No plans match</p>
           <p className="mt-1 text-sm text-muted">Try a different word, or clear the filters.</p>
         </div>

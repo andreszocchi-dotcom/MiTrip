@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { DayStrip } from "@/components/day-strip";
 import { PlanCard } from "@/components/plan-card";
 import { NextDayLabel, TodayBadge } from "@/components/today-link";
@@ -70,65 +69,65 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <Link href={`/trips/${trip.id}`} className="mt-6 text-sm font-medium text-muted">
-        ← {trip.name}
+    <main className="page">
+      <Link href={`/trips/${trip.id}`} className="link text-sm">
+        ‹ {trip.name}
       </Link>
 
       <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
 
-      <section className="mt-4 rounded-3xl p-6" style={{ backgroundColor: theme.soft }}>
-        <p className="text-sm font-medium" style={{ color: theme.strong }}>
+      <section className="mt-4 rounded-[28px] p-7 sm:p-10" style={{ backgroundColor: theme.soft }}>
+        <p className="eyebrow" style={{ color: theme.strong }}>
           Day {index + 1} of {dayIds.length}
           <TodayBadge date={day.date} color={theme.strong} />
         </p>
-        <h1 className="mt-1 text-3xl font-semibold">{formatDay(day.date)}</h1>
-        {day.greeting && <p className="mt-2 text-lg">{day.greeting}</p>}
+        <h1 className="headline-lg mt-2">{formatDay(day.date)}</h1>
+        {day.greeting && <p className="mt-3 text-[19px] leading-snug">{day.greeting}</p>}
       </section>
 
-      <nav className="mt-4 flex justify-between text-sm font-medium text-accent">
+      <nav className="mt-4 flex justify-between px-1 text-sm [&_a]:link">
         {prevId ? <Link href={dayHref(prevId)}>‹ Previous day</Link> : <span />}
         {nextId ? <Link href={dayHref(nextId)}>Next day ›</Link> : <span />}
       </nav>
 
-      <div className="mt-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Plans</h2>
-        {isOwner && (
-          <Link
-            href={`${dayHref(day.id)}/new`}
-            className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white"
-          >
-            + Add plan
-          </Link>
-        )}
-      </div>
-
       {routeLinks.length > 0 && (
-        <div className="mt-3 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-black/5">
-          <p className="text-sm text-muted">
-            {stops.length} stops today, in plan order, starting from where you are.
+        <section className="tile mt-4 p-6 sm:p-7">
+          <p className="eyebrow" style={{ color: theme.strong }}>
+            Today&apos;s route
           </p>
-          <div className="mt-3 flex flex-col gap-2">
+          <p className="mt-1 text-[21px] font-semibold leading-snug tracking-[-0.02em]">
+            {stops.length} stops, in order.
+          </p>
+          <p className="mt-1 text-muted">Starts from where you are. Pick driving, walking, or transit in Maps.</p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             {routeLinks.map((link, i) => (
               <a
                 key={link}
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full bg-accent px-4 py-2.5 text-center text-sm font-medium text-white"
+                className="btn btn-primary"
               >
                 {routeLinks.length > 1
-                  ? `Day route, part ${i + 1} of ${routeLinks.length} ↗`
-                  : "Open the day's route in Google Maps ↗"}
+                  ? `Part ${i + 1} of ${routeLinks.length} in Google Maps ↗`
+                  : "Open in Google Maps ↗"}
               </a>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
+      <div className="mt-12 flex items-center justify-between">
+        <h2 className="section-title">Plans</h2>
+        {isOwner && (
+          <Link href={`${dayHref(day.id)}/new`} className="btn btn-primary btn-sm">
+            Add plan
+          </Link>
+        )}
+      </div>
+
       {plans.length > 0 ? (
-        <ul className="mt-3 flex flex-col gap-3">
+        <ul className="mt-4 flex flex-col gap-3">
           {plans.map((plan) => (
             <PlanCard
               key={plan.id}
@@ -139,7 +138,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
           ))}
         </ul>
       ) : (
-        <div className="mt-3 rounded-2xl bg-surface p-6 text-center text-muted shadow-sm ring-1 ring-black/5">
+        <div className="tile mt-4 p-10 text-center text-muted">
           No plans for this day yet.
         </div>
       )}
@@ -147,10 +146,10 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
       {nextDay && (
         <Link
           href={dayHref(nextDay.id)}
-          className="mt-8 block rounded-3xl p-6 shadow-sm ring-1 ring-black/5 transition-transform active:scale-[0.99]"
+          className="mt-12 block rounded-[28px] p-7 transition-transform active:scale-[0.99] sm:p-9"
           style={{ backgroundColor: theme.soft }}
         >
-          <p className="text-sm font-medium" style={{ color: theme.strong }}>
+          <p className="eyebrow" style={{ color: theme.strong }}>
             <NextDayLabel date={day.date} /> · {formatDay(nextDay.date)}
           </p>
           {nextDay.summary && <p className="mt-2 text-lg">{nextDay.summary}</p>}

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { StarButton } from "@/components/star-button";
 import { TicketUpload } from "@/components/ticket-upload";
@@ -49,29 +48,28 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
   ].filter((d) => d.value);
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-10">
-      <AppHeader />
-      <Link href={dayHref} className="mt-6 text-sm font-medium text-muted">
-        ← {formatDay(day.date)}
+    <main className="page">
+      <Link href={dayHref} className="link text-sm">
+        ‹ {formatDay(day.date)}
       </Link>
 
-      <section className="mt-4 rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-black/5">
+      <section className="tile mt-4 p-7 sm:p-10">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-sm font-medium text-accent">
+          <p className="eyebrow text-accent">
             <span aria-hidden="true">{type.icon}</span> {type.label}
           </p>
           <StarButton planId={plan.id} starred={plan.stars.length > 0} size="large" />
         </div>
-        <h1 className="mt-2 text-2xl font-semibold">{plan.title}</h1>
+        <h1 className="headline mt-2">{plan.title}</h1>
         {plan.start_time && (
-          <p className="mt-1 text-lg text-muted">
+          <p className="mt-2 text-[21px] text-muted">
             {formatTime(plan.start_time)}
             {plan.end_time && ` – ${formatTime(plan.end_time)}`}
           </p>
         )}
 
         {details.length > 0 && (
-          <dl className="mt-5 flex flex-col gap-3 border-t border-black/5 pt-5">
+          <dl className="mt-5 flex flex-col gap-3 border-t border-black/[0.06] pt-5">
             {details.map((d) => (
               <div key={d.label}>
                 <dt className="text-xs font-medium uppercase text-muted">{d.label}</dt>
@@ -86,7 +84,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
             href={googleMapsUrl(plan.address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 block rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+            className="mt-5 block btn btn-secondary"
           >
             Open in Google Maps ↗
           </a>
@@ -97,21 +95,21 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
             href={plan.ticket_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 block rounded-xl bg-accent px-4 py-3 text-center text-base font-medium text-white"
+            className="mt-5 block btn btn-primary"
           >
             Open ticket ↗
           </a>
         )}
 
         {ticket?.signedUrl && (
-          <div className="mt-5 border-t border-black/5 pt-5">
+          <div className="mt-5 border-t border-black/[0.06] pt-5">
             <p className="text-xs font-medium uppercase text-muted">Ticket</p>
             <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
               {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}
               <img
                 src={ticket.signedUrl}
                 alt={`Ticket for ${plan.title}`}
-                className="max-h-96 w-full rounded-xl bg-background object-contain ring-1 ring-black/5"
+                className="max-h-96 w-full rounded-[12px] bg-background object-contain"
               />
             </a>
             <p className="mt-1 text-center text-xs text-muted">Tap to open full size</p>
@@ -130,7 +128,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
         )}
 
         {plan.notes && (
-          <p className="mt-5 whitespace-pre-wrap border-t border-black/5 pt-5 leading-relaxed">
+          <p className="mt-5 whitespace-pre-wrap border-t border-black/[0.06] pt-5 leading-relaxed">
             {plan.notes}
           </p>
         )}
@@ -140,7 +138,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href={`/trips/${day.trip_id}/plans/${plan.id}/edit`}
-            className="flex-1 rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+            className="btn btn-secondary flex-1"
           >
             Edit plan
           </Link>

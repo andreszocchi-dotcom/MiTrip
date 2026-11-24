@@ -85,7 +85,7 @@ export function TripForm({
                 className="peer sr-only"
               />
               <span
-                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm ring-1 ring-black/10 peer-checked:ring-2 peer-checked:ring-[var(--ring)]"
+                className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm ring-[var(--ring)] peer-checked:ring-2 peer-focus-visible:outline-2 peer-focus-visible:outline-accent"
                 style={{ backgroundColor: theme.soft, color: theme.strong, ["--ring" as string]: theme.strong }}
               >
                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: theme.strong }} />
@@ -134,7 +134,7 @@ export function TripForm({
       </label>
 
       {(hasErrors || state?.error) && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           {state?.error ?? "Almost there. Fix the fields marked in red above."}
         </p>
       )}
@@ -142,14 +142,14 @@ export function TripForm({
       <div className="flex gap-3">
         <Link
           href={cancelHref}
-          className="flex-1 rounded-xl bg-accent-soft px-4 py-3 text-center text-base font-medium text-accent"
+          className="btn btn-secondary flex-1"
         >
           Cancel
         </Link>
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-xl bg-accent px-4 py-3 text-base font-medium text-white disabled:opacity-60"
+          className="btn btn-primary flex-1"
         >
           {pending ? "Saving..." : submitLabel}
         </button>

@@ -34,14 +34,14 @@ export function PlanCard({
 }) {
   const type = planTypeOf(plan.type);
   return (
-    <li className="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-black/5">
-      <Link href={href} className="flex gap-4 p-5 transition-colors active:bg-black/[0.03]">
-        <span className="text-2xl" aria-hidden="true">
+    <li className="tile overflow-hidden">
+      <Link href={href} className="flex gap-4 p-6 transition-colors hover:bg-black/[0.015] active:bg-black/[0.03]">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-background text-xl" aria-hidden="true">
           {type.icon}
         </span>
         <div className="min-w-0 flex-1">
           {context ? (
-            <p className="text-xs font-medium" style={{ color: context.color }}>
+            <p className="text-[13px] font-semibold" style={{ color: context.color }}>
               {context.text}
             </p>
           ) : (
@@ -50,7 +50,7 @@ export function PlanCard({
               {plan.end_time && ` – ${formatTime(plan.end_time)}`}
             </p>
           )}
-          <p className="mt-0.5 font-medium" data-plan-title>
+          <p className="mt-0.5 text-[19px] font-semibold leading-snug tracking-[-0.015em]" data-plan-title>
             {plan.title}
           </p>
           {plan.address && (
@@ -74,12 +74,12 @@ export function PlanCard({
           href={plan.ticket_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mx-5 mb-4 block rounded-xl bg-accent px-4 py-3 text-center text-base font-medium text-white"
+          className="btn btn-primary mx-6 mb-5 flex"
         >
           Open ticket ↗
         </a>
       )}
-      <div className="flex divide-x divide-black/5 border-t border-black/5">
+      <div className="flex divide-x divide-black/[0.06] border-t border-black/[0.06]">
         <div className="flex-1">
           <StarButton planId={plan.id} starred={starred} />
         </div>
@@ -88,7 +88,7 @@ export function PlanCard({
             href={googleMapsUrl(plan.address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-[2] px-5 py-3 text-center text-sm font-medium text-accent"
+            className="link flex-[2] px-5 py-3 text-center text-sm"
           >
             Open in Google Maps ↗
           </a>

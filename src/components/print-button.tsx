@@ -7,7 +7,7 @@ export function PrintButton({ color }: { color: string }) {
     <button
       type="button"
       onClick={() => window.print()}
-      className="w-full rounded-xl px-4 py-3 text-base font-semibold text-white print:hidden"
+      className="btn w-full text-white print:hidden"
       style={{ backgroundColor: color }}
     >
       Save as PDF

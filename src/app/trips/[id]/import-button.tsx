@@ -13,9 +13,9 @@ export function ImportButton({ tripId, existingPlans }: { tripId: number; existi
   const needsConfirm = existingPlans > 0 && !confirming && !pending;
 
   return (
-    <div className="mt-6 rounded-2xl bg-accent-soft p-5">
-      <p className="font-medium text-accent">✨ Import itinerary into days</p>
-      <p className="mt-1 text-sm text-muted">
+    <div className="tile mt-4 p-6">
+      <p className="section-title">✨ Import itinerary into days</p>
+      <p className="subhead mt-2 !text-[19px]">
         AI reads your pasted itinerary and adds each item as a plan on the right day, with
         Google Maps links.
       </p>
@@ -24,7 +24,7 @@ export function ImportButton({ tripId, existingPlans }: { tripId: number; existi
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className="mt-4 w-full rounded-xl bg-accent px-4 py-3 text-base font-medium text-white"
+          className="btn btn-primary mt-4 w-full"
         >
           Import again
         </button>
@@ -39,7 +39,7 @@ export function ImportButton({ tripId, existingPlans }: { tripId: number; existi
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-xl bg-accent px-4 py-3 text-base font-medium text-white disabled:opacity-60"
+            className="btn btn-primary w-full"
           >
             {pending ? "Reading your itinerary… (about 30 seconds)" : existingPlans > 0 ? "Yes, import again" : "Import"}
           </button>
@@ -47,12 +47,12 @@ export function ImportButton({ tripId, existingPlans }: { tripId: number; existi
       )}
 
       {state?.ok === false && (
-        <p role="alert" className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="mt-3 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           {state.error}
         </p>
       )}
       {state?.ok && (
-        <p role="status" className="mt-3 rounded-xl bg-surface px-4 py-3 text-sm">
+        <p role="status" className="mt-3 rounded-[12px] bg-surface px-4 py-3 text-sm">
           Added {state.planCount} plans across {state.dayCount} days.
           {state.skippedDays > 0 && ` Skipped ${state.skippedDays} days outside the trip dates.`}
           <span className="mt-1 block text-muted">

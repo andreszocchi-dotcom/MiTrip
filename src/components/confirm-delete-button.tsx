@@ -19,7 +19,7 @@ export function ConfirmDeleteButton({
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="flex-1 rounded-xl bg-red-50 px-4 py-3 text-base font-medium text-red-700"
+        className="btn btn-danger flex-1"
       >
         {label}
       </button>
@@ -27,21 +27,21 @@ export function ConfirmDeleteButton({
   }
 
   return (
-    <div role="alertdialog" className="w-full rounded-2xl bg-red-50 p-4 text-red-800">
+    <div role="alertdialog" className="w-full rounded-[22px] bg-[#fdecec] p-5 text-[#7a1a12]">
       <p className="font-medium">Are you sure?</p>
       <p className="mt-1 text-sm">{warning}</p>
       <div className="mt-4 flex gap-3">
         <button
           type="button"
           onClick={() => setConfirming(false)}
-          className="flex-1 rounded-xl bg-surface px-4 py-3 text-base font-medium text-foreground ring-1 ring-black/10"
+          className="btn flex-1 bg-surface text-foreground"
         >
           Cancel
         </button>
         <form action={action} className="flex-1">
           <button
             type="submit"
-            className="w-full rounded-xl bg-red-600 px-4 py-3 text-base font-medium text-white"
+            className="btn w-full bg-[#d92d20] text-white hover:bg-[#b42318]"
           >
             Yes, delete
           </button>

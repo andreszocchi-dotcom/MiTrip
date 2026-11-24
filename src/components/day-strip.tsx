@@ -49,8 +49,8 @@ export function DayStrip({
                 href={`/trips/${tripId}/days/${day.id}`}
                 aria-current={isCurrent ? "page" : undefined}
                 aria-label={`Day ${index + 1}, ${weekday(day.date)} ${month(day.date)} ${Number(day.date.slice(8))}, ${day.planCount} plans`}
-                className={`flex w-11 flex-col items-center rounded-xl py-1.5 ring-1 transition-colors ${
-                  isCurrent ? "text-white ring-transparent" : "bg-surface text-foreground ring-black/10"
+                className={`flex w-12 flex-col items-center rounded-[14px] py-2 transition-colors ${
+                  isCurrent ? "text-white" : "bg-surface text-foreground hover:bg-white/60"
                 }`}
                 style={isCurrent ? { backgroundColor: color } : undefined}
               >
