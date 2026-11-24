@@ -12,6 +12,7 @@ Ideas that were out of scope for the solo assignment (due Nov 4, 2026) or held a
 | Star trips as well as plans | Shipped Nov 23, 2026 (#60) in its own `trip_stars` table, so plan stars stay unchanged. Starred trips sort first and show on the Starred page. |
 | Graphics for trip themes | Shipped Nov 23, 2026 (#59) as soft line-art scenes (waves, dunes, pines, sunset, peaks) on trip cards and headers. |
 | Open the whole day in Google Maps | New idea, shipped Nov 23, 2026 (#56): one button opens directions from your location through every stop of the day, in order. |
+| Continue with Google sign-in | Shipped Nov 24, 2026 (#62) after setting up a published Google Cloud OAuth client (which needed the new privacy page, #67) and turning Google on in Supabase. Google shows the Supabase address on its screen until the brand is verified. |
 
 ## Stretch goals (in PLAN.md, built only after the committed features ship)
 
@@ -24,4 +25,3 @@ Ideas that were out of scope for the solo assignment (due Nov 4, 2026) or held a
 | Idea | Source | Why parked |
 |---|---|---|
 | Link airline apps to pull flight details | Sketch 05 | No shared airline API; flight details are entered by hand instead |
-| Continue with Google sign-in | PLAN.md feature 1 | Postponed Oct 29, 2026 (issue #7). Ported onto the redesign Nov 23, 2026 as draft PR #62. To finish: create a Google Cloud OAuth client, turn on Google in the Supabase dashboard with its client ID and secret, then merge #62. |
