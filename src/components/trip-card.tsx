@@ -12,7 +12,9 @@ export type TripCardTrip = {
   start_date: string;
   end_date: string;
   theme: string;
-  days?: { id: number; date: string }[];
+  timezone?: string | null;
+  place_name?: string | null;
+  days?: { id: number; date: string; timezone?: string | null }[];
 };
 
 // A trip as a picture: its name on the scene's own sky, the scene below.
@@ -38,7 +40,7 @@ export function TripCard({
       >
         <div className={feature ? "px-7 pb-2 pt-8 sm:px-12 sm:pt-12" : "px-6 pb-1 pt-6 sm:px-7 sm:pt-7"}>
           <p className="eyebrow opacity-80">
-            <TripCountdown start={trip.start_date} end={trip.end_date} />
+            <TripCountdown start={trip.start_date} end={trip.end_date} timezone={trip.timezone} />
             {shared && " · Shared with you"}
           </p>
           <p
@@ -66,7 +68,7 @@ export function TripCard({
           <StarButton tripId={trip.id} starred={starred} size="icon" />
         </div>
       )}
-      {trip.days && <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />}
+      {trip.days && <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} timezone={trip.timezone} />}
     </li>
   );
 }

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { NO_PLACE, readPlace, type MaybePlace } from "@/lib/places";
 import { validateTrip, type FieldErrors } from "@/lib/validation";
 
 // On a problem, the form gets back friendly messages per field plus what
@@ -12,6 +13,8 @@ export type TripFormState =
 
 function readTrip(formData: FormData) {
   const optional = (key: string) => String(formData.get(key) ?? "").trim() || null;
+  // The trip's main city, from the place picker (or none).
+  const place: MaybePlace = readPlace(formData) ?? NO_PLACE;
   return {
     name: String(formData.get("name") ?? "").trim(),
     start_date: String(formData.get("start_date") ?? ""),
@@ -19,6 +22,7 @@ function readTrip(formData: FormData) {
     theme: String(formData.get("theme") ?? "ocean"),
     google_maps_list_url: optional("google_maps_list_url"),
     itinerary_text: optional("itinerary_text"),
+    ...place,
   };
 }
 

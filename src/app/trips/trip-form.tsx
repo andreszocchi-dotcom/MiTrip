@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { FieldError, errorProps, inputClass } from "@/components/form-field";
+import { PlacePicker } from "@/components/place-picker";
 import { TripScene } from "@/components/trip-scene";
+import { placeOf } from "@/lib/places";
 import { THEMES } from "@/lib/themes";
 import type { TripFormState } from "./actions";
 
@@ -14,6 +16,10 @@ type Trip = {
   theme: string;
   google_maps_list_url: string | null;
   itinerary_text: string | null;
+  place_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  timezone: string | null;
 };
 
 export function TripForm({
@@ -71,6 +77,16 @@ export function TripForm({
           />
           <FieldError id="end_date-error" message={errors.end_date} />
         </label>
+      </div>
+
+      <div className="flex flex-col gap-1.5 text-sm font-medium">
+        <span>
+          Main city <span className="font-normal text-muted">(optional)</span>
+        </span>
+        <span className="font-normal text-muted">
+          For weather and local time. MiTrip also finds each day&apos;s city from its plans&apos; addresses.
+        </span>
+        <PlacePicker defaultPlace={placeOf(values)} placeholder="Sydney, Lisbon, Tokyo…" />
       </div>
 
       <fieldset className="flex flex-col gap-2">

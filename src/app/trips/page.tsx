@@ -21,7 +21,7 @@ export default async function TripsPage() {
   // Row Level Security returns only trips I own or was invited to.
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, name, start_date, end_date, theme, owner_id, days(id, date), trip_stars(user_id)")
+    .select("id, name, start_date, end_date, theme, owner_id, timezone, place_name, days(id, date, timezone), trip_stars(user_id)")
     .order("start_date")
     .order("date", { referencedTable: "days" });
 
