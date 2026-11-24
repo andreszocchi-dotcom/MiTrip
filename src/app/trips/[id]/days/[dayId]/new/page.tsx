@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHero } from "@/components/page-hero";
 import { notFound } from "next/navigation";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
@@ -26,14 +27,15 @@ export default async function NewPlanPage({ params }: PageProps<"/trips/[id]/day
 
   const dayHref = `/trips/${day.trip_id}/days/${day.id}`;
   return (
-    <main className="page">
-      <h1 className="headline">Add a plan</h1>
-      <p className="mt-1 text-muted">{formatDay(day.date)}</p>
+    <main className="page !max-w-[640px]">
+      <PageHero title="Add a plan." subtitle={formatDay(day.date)} />
+      <div className="tile p-6 sm:p-10">
       <PlanForm
         action={createPlan.bind(null, day.trip_id, day.id)}
         submitLabel="Add plan"
         cancelHref={dayHref}
       />
+      </div>
     </main>
   );
 }

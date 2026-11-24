@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { DayStrip } from "@/components/day-strip";
-import { ThemeArt } from "@/components/theme-art";
+import { Icon, type IconName } from "@/components/icons";
+import { StarButton } from "@/components/star-button";
+import { SubNav } from "@/components/sub-nav";
 import { TodayLink } from "@/components/today-link";
+import { TripCountdown } from "@/components/trip-countdown";
+import { SceneBanner } from "@/components/trip-scene";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import { StarButton } from "@/components/star-button";
 import { themeOf } from "@/lib/themes";
 import { deleteTrip } from "../actions";
 import { ImportButton } from "./import-button";
@@ -16,6 +19,45 @@ import { People } from "./people";
 export const metadata: Metadata = { title: "Trip · MiTrip" };
 // The AI itinerary import can take up to a minute on long itineraries.
 export const maxDuration = 120;
+
+function ActionTile({
+  href,
+  icon,
+  title,
+  text,
+  external = false,
+  color,
+}: {
+  href: string;
+  icon: IconName;
+  title: string;
+  text: string;
+  external?: boolean;
+  color: string;
+}) {
+  const inner = (
+    <>
+      <span style={{ color }}>
+        <Icon name={icon} className="h-7 w-7" />
+      </span>
+      <span className="mt-6 block text-[19px] font-semibold tracking-[-0.02em]">
+        {title}
+        {external && <span className="text-muted"> ↗</span>}
+      </span>
+      <span className="mt-0.5 block text-sm text-muted">{text}</span>
+    </>
+  );
+  const className = "tile block p-6 transition-colors hover:bg-white/70 active:scale-[0.99]";
+  return external ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {inner}
+    </a>
+  ) : (
+    <Link href={href} className={className}>
+      {inner}
+    </Link>
+  );
+}
 
 export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const { id } = await params;
@@ -45,135 +87,175 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const theme = themeOf(trip.theme);
   const isOwner = trip.owner_id === user.id;
   const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
+  const dayCount = countDays(trip.start_date, trip.end_date);
 
   return (
-    <main className="page">
-      <Link href="/trips" className="link text-sm">
-        ‹ My trips
-      </Link>
+    <main className="flex flex-1 flex-col">
+      <SubNav title={trip.name} href={`/trips/${trip.id}`}>
+        <a href="#days" className="hidden text-foreground/70 hover:text-foreground sm:inline">
+          Days
+        </a>
+        <a href="#people" className="hidden text-foreground/70 hover:text-foreground sm:inline">
+          {isOwner ? "Share" : "People"}
+        </a>
+        {isOwner ? (
+          <Link href={`/trips/${trip.id}/edit`} className="btn btn-primary px-3.5 py-1 text-[13px]">
+            Edit
+          </Link>
+        ) : (
+          <span className="text-muted">View only</span>
+        )}
+      </SubNav>
 
-      <section className="relative isolate mt-4 overflow-hidden rounded-[28px] p-7 pb-24 sm:p-10 sm:pb-28" style={{ backgroundColor: theme.soft }}>
-        <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-28 w-full" />
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="headline-lg" style={{ color: theme.strong }}>
-            {trip.name}
-          </h1>
-          <div className="-mr-2 -mt-2 shrink-0 sm:mr-0 sm:mt-0">
-            <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="icon" />
+      {/* Hero: the trip's name on its own sky, the full scene below. */}
+      <section style={{ backgroundColor: theme.sky, color: theme.ink }}>
+        <div className="mx-auto max-w-[980px] px-4 pt-14 text-center sm:pt-24">
+          <p className="eyebrow opacity-80">
+            <TripCountdown start={trip.start_date} end={trip.end_date} />
+          </p>
+          <h1 className="headline-xl mx-auto mt-2 max-w-[900px] text-balance">{trip.name}</h1>
+          <p className="mt-4 text-[19px] opacity-80 sm:text-[24px]">
+            {formatDateRange(trip.start_date, trip.end_date)} · {dayCount} days
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="large" />
           </div>
         </div>
-        <p className="mt-3 text-[19px] text-foreground">
-          {formatDateRange(trip.start_date, trip.end_date)}
-          <span className="text-muted">
-            {" · "}
-            {countDays(trip.start_date, trip.end_date)} days
-          </span>
-        </p>
-        {trip.google_maps_list_url && (
-          <a
-            href={trip.google_maps_list_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-sm mt-6 bg-surface"
-            style={{ color: theme.strong }}
-          >
-            Open my Google Maps list ↗
-          </a>
-        )}
-        {!isOwner && <p className="mt-3 text-sm text-muted">Shared with you (view only)</p>}
+        <SceneBanner
+          theme={trip.theme}
+          uid={`hero-${trip.id}`}
+          sky={theme.sky}
+          className="mt-8 aspect-[2/1] max-h-[620px] min-h-64 sm:mt-4"
+        />
       </section>
 
-      <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
+      <div className="page !pt-10">
+        <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
 
-      <Link
-        href={`/trips/${trip.id}/print`}
-        className="tile mt-3 flex items-center justify-between px-6 py-4 transition-colors hover:bg-white/70"
-      >
-        <span>
-          <span className="block font-medium">Save as PDF</span>
-          <span className="block text-sm text-muted">For when there&apos;s no signal</span>
-        </span>
-        <span className="text-muted" aria-hidden="true">›</span>
-      </Link>
-
-      <p className="mt-10 text-sm font-medium text-muted">Jump to a day</p>
-      <DayStrip
-        tripId={trip.id}
-        days={trip.days.map((d) => ({ id: d.id, date: d.date, planCount: d.plans[0]?.count ?? 0 }))}
-        color={theme.strong}
-      />
-
-      {trip.itinerary_text && (
-        <details className="tile mt-6 p-6">
-          <summary className="cursor-pointer font-medium">Itinerary</summary>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted">
-            {trip.itinerary_text}
-          </p>
-        </details>
-      )}
-
-      {isOwner && trip.itinerary_text && (
-        <ImportButton tripId={trip.id} existingPlans={totalPlans} />
-      )}
-
-      <div className="mt-12 flex items-baseline justify-between">
-        <h2 className="section-title">Days</h2>
-        {totalPlans > 0 && (
-          <Link href={`/search?trip=${trip.id}`} className="link text-sm">
-            Search this trip
-          </Link>
-        )}
-      </div>
-      <ul className="tile mt-4 divide-y divide-black/[0.06] overflow-hidden">
-        {trip.days.map((day, index) => {
-          const planCount = day.plans[0]?.count ?? 0;
-          return (
-            <li key={day.id}>
-              <Link
-                href={`/trips/${trip.id}/days/${day.id}`}
-                className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-black/[0.02] active:bg-black/[0.04]"
-              >
-                <div>
-                  <p className="font-medium">
-                    Day {index + 1} · {formatDay(day.date)}
-                  </p>
-                  {day.greeting && <p className="text-sm text-muted">{day.greeting}</p>}
-                </div>
-                <span className="text-sm text-muted">
-                  {planCount} {planCount === 1 ? "plan" : "plans"} ›
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-
-      <div className="mt-12">
-        <People
-          tripId={trip.id}
-          tripName={trip.name}
-          isOwner={isOwner}
-          inviteCode={isOwner ? trip.invite_code : null}
-          people={people ?? []}
-          myId={user.id}
-        />
-      </div>
-
-      {isOwner && (
-        <div className="mt-12 flex flex-wrap gap-3">
-          <Link
-            href={`/trips/${trip.id}/edit`}
-            className="btn btn-secondary flex-1"
-          >
-            Edit trip
-          </Link>
-          <ConfirmDeleteButton
-            action={deleteTrip.bind(null, trip.id)}
-            label="Delete trip"
-            warning={`This deletes “${trip.name}” and every day and plan in it. This can’t be undone.`}
+        {/* Quick actions */}
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+          <ActionTile
+            href={`/trips/${trip.id}/print`}
+            icon="doc"
+            title="Save as PDF"
+            text="For when there's no signal"
+            color={theme.strong}
+          />
+          <ActionTile
+            href={`/search?trip=${trip.id}`}
+            icon="search"
+            title="Search"
+            text={`${totalPlans} ${totalPlans === 1 ? "plan" : "plans"} in this trip`}
+            color={theme.strong}
+          />
+          {trip.google_maps_list_url && (
+            <ActionTile
+              href={trip.google_maps_list_url}
+              icon="map"
+              title="Maps list"
+              text="Your saved places"
+              external
+              color={theme.strong}
+            />
+          )}
+          <ActionTile
+            href="#people"
+            icon="people"
+            title={isOwner ? "Share" : "People"}
+            text={isOwner ? "Invite someone to view" : `${(people ?? []).length} on this trip`}
+            color={theme.strong}
           />
         </div>
-      )}
+
+        {/* Day by day */}
+        <section id="days" className="mt-24 scroll-mt-28">
+          <div className="text-center">
+            <h2 className="headline">Day by day.</h2>
+            <p className="subhead mt-3">
+              {dayCount} days, {totalPlans} {totalPlans === 1 ? "plan" : "plans"}.
+            </p>
+          </div>
+          <div className="mt-8">
+            <DayStrip
+              tripId={trip.id}
+              days={trip.days.map((d) => ({ id: d.id, date: d.date, planCount: d.plans[0]?.count ?? 0 }))}
+              color={theme.strong}
+            />
+          </div>
+          <ul className="tile mt-4 divide-y divide-black/[0.06] overflow-hidden">
+            {trip.days.map((day, index) => {
+              const planCount = day.plans[0]?.count ?? 0;
+              return (
+                <li key={day.id}>
+                  <Link
+                    href={`/trips/${trip.id}/days/${day.id}`}
+                    className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-black/[0.02] active:bg-black/[0.04] sm:px-6"
+                  >
+                    <span
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold tabular-nums"
+                      style={{ backgroundColor: theme.soft, color: theme.ink }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-medium">{formatDay(day.date)}</span>
+                      {day.greeting && <span className="block truncate text-sm text-muted">{day.greeting}</span>}
+                    </span>
+                    <span className="shrink-0 text-sm text-muted">
+                      {planCount > 0 ? `${planCount} ${planCount === 1 ? "plan" : "plans"}` : ""} ›
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {trip.itinerary_text && (
+          <section className="mt-24">
+            <div className="text-center">
+              <h2 className="headline">Your itinerary.</h2>
+              <p className="subhead mt-3">The plan you pasted, kept as you wrote it.</p>
+            </div>
+            {isOwner && <ImportButton tripId={trip.id} existingPlans={totalPlans} />}
+            <details className="tile mt-4 p-6">
+              <summary className="cursor-pointer font-medium">Show the full itinerary</summary>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted">{trip.itinerary_text}</p>
+            </details>
+          </section>
+        )}
+
+        <section id="people" className="mt-24 scroll-mt-28">
+          <div className="mb-8 text-center">
+            <h2 className="headline">{isOwner ? "Better together." : "Who's going."}</h2>
+            <p className="subhead mt-3">
+              {isOwner ? "Share a link and anyone you invite can follow along." : "Everyone on this trip."}
+            </p>
+          </div>
+          <People
+            tripId={trip.id}
+            tripName={trip.name}
+            isOwner={isOwner}
+            inviteCode={isOwner ? trip.invite_code : null}
+            people={people ?? []}
+            myId={user.id}
+          />
+        </section>
+
+        {isOwner && (
+          <div className="mt-16 flex flex-wrap gap-3 border-t border-line pt-8">
+            <Link href={`/trips/${trip.id}/edit`} className="btn btn-secondary flex-1">
+              <Icon name="pencil" className="h-5 w-5" />
+              Edit trip
+            </Link>
+            <ConfirmDeleteButton
+              action={deleteTrip.bind(null, trip.id)}
+              label="Delete trip"
+              warning={`This deletes “${trip.name}” and every day and plan in it. This can’t be undone.`}
+            />
+          </div>
+        )}
+      </div>
     </main>
   );
 }

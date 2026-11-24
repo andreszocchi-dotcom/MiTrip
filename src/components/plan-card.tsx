@@ -34,7 +34,8 @@ export function PlanCard({
 }) {
   const type = planTypeOf(plan.type);
   return (
-    <li className="tile overflow-hidden">
+    <li className="relative">
+      <div className="tile overflow-hidden">
       <Link href={href} className="flex gap-4 p-6 transition-colors hover:bg-black/[0.015] active:bg-black/[0.03]">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-background text-xl" aria-hidden="true">
           {type.icon}
@@ -93,6 +94,7 @@ export function PlanCard({
             Open in Google Maps ↗
           </a>
         )}
+      </div>
       </div>
     </li>
   );

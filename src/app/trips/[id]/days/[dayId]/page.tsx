@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DayStrip } from "@/components/day-strip";
+import { Icon } from "@/components/icons";
 import { PlanCard } from "@/components/plan-card";
-import { ThemeArt } from "@/components/theme-art";
+import { SubNav } from "@/components/sub-nav";
 import { NextDayLabel, TodayBadge } from "@/components/today-link";
+import { SceneBanner } from "@/components/trip-scene";
 import { formatDay, formatTime } from "@/lib/dates";
 import { dayRouteLinks, routeStops } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
@@ -69,113 +71,170 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const routeLinks = dayRouteLinks(stops);
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
 
+  // The stops as the route panel lists them: the first plan at each place.
+  const stopPlans = plans.filter(
+    (plan, i) =>
+      plan.address?.trim() &&
+      plans
+        .slice(0, i)
+        .filter((p) => p.address?.trim())
+        .at(-1)
+        ?.address?.trim()
+        .toLowerCase() !== plan.address.trim().toLowerCase(),
+  );
+
   return (
-    <main className="page">
-      <Link href={`/trips/${trip.id}`} className="link text-sm">
-        ‹ {trip.name}
-      </Link>
-
-      <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
-
-      <section className="relative isolate mt-4 overflow-hidden rounded-[28px] p-7 pb-20 sm:p-10 sm:pb-24" style={{ backgroundColor: theme.soft }}>
-        <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-24 w-full" />
-        <p className="eyebrow" style={{ color: theme.strong }}>
+    <main className="flex flex-1 flex-col">
+      <SubNav title={trip.name} href={`/trips/${trip.id}`}>
+        {prevId ? (
+          <Link href={dayHref(prevId)} className="text-foreground/70 hover:text-foreground" aria-label="Previous day">
+            ‹ <span className="hidden sm:inline">Previous</span>
+          </Link>
+        ) : (
+          <span className="text-foreground/25">‹</span>
+        )}
+        <span className="tabular-nums text-muted">
           Day {index + 1} of {dayIds.length}
-          <TodayBadge date={day.date} color={theme.strong} />
-        </p>
-        <h1 className="headline-lg mt-2">{formatDay(day.date)}</h1>
-        {day.greeting && <p className="mt-3 text-[19px] leading-snug">{day.greeting}</p>}
+        </span>
+        {nextId ? (
+          <Link href={dayHref(nextId)} className="text-foreground/70 hover:text-foreground" aria-label="Next day">
+            <span className="hidden sm:inline">Next</span> ›
+          </Link>
+        ) : (
+          <span className="text-foreground/25">›</span>
+        )}
+      </SubNav>
+
+      <section style={{ backgroundColor: theme.sky, color: theme.ink }}>
+        <div className="mx-auto max-w-[980px] px-4 pt-12 text-center sm:pt-20">
+          <p className="eyebrow opacity-80">
+            Day {index + 1}
+            <TodayBadge date={day.date} color={theme.ink} />
+          </p>
+          <h1 className="headline-xl mt-2">{formatDay(day.date)}</h1>
+          {day.greeting && (
+            <p className="mx-auto mt-4 max-w-[640px] text-[19px] leading-snug opacity-85 sm:text-[24px]">
+              {day.greeting}
+            </p>
+          )}
+        </div>
+        <SceneBanner
+          theme={trip.theme}
+          uid={`day-${day.id}`}
+          sky={theme.sky}
+          className="mt-6 aspect-[3/1] max-h-[420px] min-h-48"
+        />
       </section>
 
-      <nav className="mt-4 flex justify-between px-1 text-sm [&_a]:link">
-        {prevId ? <Link href={dayHref(prevId)}>‹ Previous day</Link> : <span />}
-        {nextId ? <Link href={dayHref(nextId)}>Next day ›</Link> : <span />}
-      </nav>
+      <div className="page !pt-8">
+        <DayStrip tripId={trip.id} days={stripDays} currentId={day.id} color={theme.strong} />
 
-      {routeLinks.length > 0 && (
-        <section className="tile mt-4 p-6 sm:p-7">
-          <p className="eyebrow" style={{ color: theme.strong }}>
-            Today&apos;s route
-          </p>
-          <p className="mt-1 text-[21px] font-semibold leading-snug tracking-[-0.02em]">
-            {stops.length} stops, in order.
-          </p>
-          <p className="mt-1 text-muted">Starts from where you are. Pick driving, walking, or transit in Maps.</p>
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-            {routeLinks.map((link, i) => (
-              <a
-                key={link}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-              >
-                {routeLinks.length > 1
-                  ? `Part ${i + 1} of ${routeLinks.length} in Google Maps ↗`
-                  : "Open in Google Maps ↗"}
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <div className="mt-12 flex items-center justify-between">
-        <h2 className="section-title">Plans</h2>
-        {isOwner && (
-          <Link href={`${dayHref(day.id)}/new`} className="btn btn-primary btn-sm">
-            Add plan
-          </Link>
-        )}
-      </div>
-
-      {plans.length > 0 ? (
-        <ul className="mt-4 flex flex-col gap-3">
-          {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              href={`/trips/${trip.id}/plans/${plan.id}`}
-              starred={plan.stars.length > 0}
-            />
-          ))}
-        </ul>
-      ) : (
-        <div className="tile mt-4 p-10 text-center text-muted">
-          No plans for this day yet.
-        </div>
-      )}
-
-      {nextDay && (
-        <Link
-          href={dayHref(nextDay.id)}
-          className="mt-12 block rounded-[28px] p-7 transition-transform active:scale-[0.99] sm:p-9"
-          style={{ backgroundColor: theme.soft }}
-        >
-          <p className="eyebrow" style={{ color: theme.strong }}>
-            <NextDayLabel date={day.date} /> · {formatDay(nextDay.date)}
-          </p>
-          {nextDay.summary && <p className="mt-2 text-lg">{nextDay.summary}</p>}
-          {nextPlans.length > 0 ? (
-            <ul className="mt-3 flex flex-col gap-1.5 text-sm">
-              {nextPlans.map((plan) => (
-                <li key={plan.id} className="flex gap-2">
-                  <span className="w-16 shrink-0 text-muted tabular-nums">
-                    {plan.start_time ? formatTime(plan.start_time) : ""}
+        {/* Today's route, as its own dark moment */}
+        {routeLinks.length > 0 && (
+          <section className="mt-10 overflow-hidden rounded-[28px] bg-ink p-7 text-white sm:p-10">
+            <p className="eyebrow text-white/60">Today&apos;s route</p>
+            <h2 className="mt-1 text-[32px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[40px]">
+              {stops.length} stops.
+              <br />
+              <span className="text-white/60">One tap.</span>
+            </h2>
+            <ol className="relative mt-7 flex flex-col gap-4">
+              <span aria-hidden="true" className="absolute bottom-3 left-[13px] top-3 w-0.5 rounded-full bg-white/15" />
+              {stopPlans.map((plan, i) => (
+                <li key={plan.id} className="relative flex items-center gap-4">
+                  <span
+                    className="z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold"
+                    style={{ backgroundColor: theme.sky, color: theme.ink }}
+                  >
+                    {i + 1}
                   </span>
-                  <span>
-                    <span aria-hidden="true">{planTypeOf(plan.type).icon}</span> {plan.title}
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{plan.title}</span>
+                    <span className="block truncate text-sm text-white/55">
+                      {plan.start_time ? `${formatTime(plan.start_time)} · ` : ""}
+                      {plan.address}
+                    </span>
                   </span>
                 </li>
               ))}
-            </ul>
-          ) : (
-            !nextDay.summary && <p className="mt-2 text-sm text-muted">Nothing planned yet.</p>
+            </ol>
+            <div className="mt-8 flex flex-col gap-2 sm:flex-row">
+              {routeLinks.map((link, i) => (
+                <a key={link} href={link} target="_blank" rel="noopener noreferrer" className="btn bg-white text-ink hover:bg-white/90">
+                  <Icon name="route" className="h-5 w-5" />
+                  {routeLinks.length > 1 ? `Part ${i + 1} of ${routeLinks.length}` : "Open in Google Maps"}
+                </a>
+              ))}
+            </div>
+            <p className="mt-3 text-sm text-white/45">Starts from where you are. Pick driving, walking, or transit in Maps.</p>
+          </section>
+        )}
+
+        {/* The plans, as a timeline */}
+        <div className="mt-16 flex items-end justify-between">
+          <h2 className="headline">The plan.</h2>
+          {isOwner && (
+            <Link href={`${dayHref(day.id)}/new`} className="btn btn-primary btn-sm">
+              Add plan
+            </Link>
           )}
-          <p className="mt-3 text-sm font-medium" style={{ color: theme.strong }}>
-            See the full day ›
-          </p>
-        </Link>
-      )}
+        </div>
+
+        {plans.length > 0 ? (
+          <ul
+            className="relative mt-6 flex flex-col gap-3 pl-7 before:absolute before:bottom-6 before:left-[9px] before:top-6 before:w-0.5 before:rounded-full before:bg-[var(--line-color)] [&>li]:relative [&>li]:before:absolute [&>li]:before:-left-[26px] [&>li]:before:top-7 [&>li]:before:h-3.5 [&>li]:before:w-3.5 [&>li]:before:rounded-full [&>li]:before:border-[3px] [&>li]:before:border-background [&>li]:before:bg-[var(--dot-color)] [&>li]:before:content-['']"
+            style={{ ["--line-color" as string]: theme.soft, ["--dot-color" as string]: theme.strong }}
+          >
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                href={`/trips/${trip.id}/plans/${plan.id}`}
+                starred={plan.stars.length > 0}
+              />
+            ))}
+          </ul>
+        ) : (
+          <div className="tile mt-6 p-10 text-center">
+            <p className="section-title">A free day.</p>
+            <p className="mt-2 text-muted">
+              {isOwner ? "Nothing planned yet. Add a plan, or leave room to wander." : "Nothing planned yet."}
+            </p>
+          </div>
+        )}
+
+        {nextDay && (
+          <Link
+            href={dayHref(nextDay.id)}
+            className="mt-16 block rounded-[28px] p-7 transition-transform active:scale-[0.99] sm:p-9"
+            style={{ backgroundColor: theme.soft }}
+          >
+            <p className="eyebrow" style={{ color: theme.strong }}>
+              <NextDayLabel date={day.date} /> · {formatDay(nextDay.date)}
+            </p>
+            {nextDay.summary && <p className="mt-2 text-[21px] font-semibold tracking-[-0.02em]">{nextDay.summary}</p>}
+            {nextPlans.length > 0 ? (
+              <ul className="mt-4 flex flex-col gap-2">
+                {nextPlans.map((plan) => (
+                  <li key={plan.id} className="flex gap-3">
+                    <span className="w-[72px] shrink-0 text-muted tabular-nums">
+                      {plan.start_time ? formatTime(plan.start_time) : ""}
+                    </span>
+                    <span>
+                      <span aria-hidden="true">{planTypeOf(plan.type).icon}</span> {plan.title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              !nextDay.summary && <p className="mt-2 text-muted">Nothing planned yet.</p>
+            )}
+            <p className="mt-5 font-medium" style={{ color: theme.strong }}>
+              See the full day ›
+            </p>
+          </Link>
+        )}
+      </div>
     </main>
   );
 }

@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { Icon, type IconName } from "@/components/icons";
 import { StarButton } from "@/components/star-button";
+import { SubNav } from "@/components/sub-nav";
 import { TicketUpload } from "@/components/ticket-upload";
 import { formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { createClient } from "@/lib/supabase/server";
+import { themeOf } from "@/lib/themes";
 import { deletePlan } from "../../../plan-actions";
 import { removeTicketImage } from "../../../ticket-actions";
 
@@ -25,7 +28,7 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
 
   const { data: plan } = await supabase
     .from("plans")
-    .select("*, stars(user_id), days(id, date, trip_id, trips(owner_id))")
+    .select("*, stars(user_id), days(id, date, trip_id, trips(owner_id, name, theme))")
     .eq("id", Number(planId))
     .maybeSingle();
   if (!plan || !plan.days || plan.days.trip_id !== Number(id)) {
@@ -42,113 +45,135 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
     ? await supabase.storage.from("tickets").createSignedUrl(plan.ticket_image, 60 * 60)
     : { data: null };
 
-  const details = [
-    { label: "Confirmation", value: plan.confirmation_number },
-    { label: "Address", value: plan.address },
-  ].filter((d) => d.value);
+  const theme = themeOf(day.trips?.theme ?? "ocean");
+  const details: { label: string; value: string; icon: IconName; href?: string }[] = [];
+  if (plan.address) {
+    details.push({ label: "Where", icon: "pin", value: plan.address, href: googleMapsUrl(plan.address) });
+  }
+  if (plan.confirmation_number) {
+    details.push({ label: "Confirmation", icon: "hash", value: plan.confirmation_number });
+  }
+  if (plan.ticket_url) {
+    details.push({ label: "Ticket", icon: "ticket", value: "Open ticket", href: plan.ticket_url });
+  }
 
   return (
-    <main className="page">
-      <Link href={dayHref} className="link text-sm">
-        ‹ {formatDay(day.date)}
-      </Link>
+    <main className="flex flex-1 flex-col">
+      <SubNav title={day.trips?.name ?? "Trip"} href={`/trips/${day.trip_id}`}>
+        <Link href={dayHref} className="text-foreground/70 hover:text-foreground">
+          ‹ {formatDay(day.date)}
+        </Link>
+      </SubNav>
 
-      <section className="tile mt-4 p-7 sm:p-10">
-        <div className="flex items-start justify-between gap-3">
-          <p className="eyebrow text-accent">
-            <span aria-hidden="true">{type.icon}</span> {type.label}
+      <div className="page !max-w-[640px]">
+        <header className="pb-10 pt-4 text-center sm:pt-8">
+          <span
+            className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-4xl"
+            style={{ backgroundColor: theme.soft }}
+            aria-hidden="true"
+          >
+            {type.icon}
+          </span>
+          <p className="eyebrow mt-6" style={{ color: theme.strong }}>
+            {type.label} · {formatDay(day.date)}
           </p>
-          <StarButton planId={plan.id} starred={plan.stars.length > 0} size="large" />
-        </div>
-        <h1 className="headline mt-2">{plan.title}</h1>
-        {plan.start_time && (
-          <p className="mt-2 text-[21px] text-muted">
-            {formatTime(plan.start_time)}
-            {plan.end_time && ` – ${formatTime(plan.end_time)}`}
-          </p>
-        )}
+          <h1 className="headline-lg mt-2 text-balance">{plan.title}</h1>
+          {plan.start_time && (
+            <p className="subhead mt-3">
+              {formatTime(plan.start_time)}
+              {plan.end_time && ` – ${formatTime(plan.end_time)}`}
+            </p>
+          )}
+          <div className="mt-6 flex justify-center">
+            <StarButton planId={plan.id} starred={plan.stars.length > 0} size="large" />
+          </div>
+        </header>
 
         {details.length > 0 && (
-          <dl className="mt-5 flex flex-col gap-3 border-t border-black/[0.06] pt-5">
-            {details.map((d) => (
-              <div key={d.label}>
-                <dt className="text-xs font-medium uppercase text-muted">{d.label}</dt>
-                <dd className="mt-0.5 select-all">{d.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-
-        {plan.address && (
-          <a
-            href={googleMapsUrl(plan.address)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 block btn btn-secondary"
-          >
-            Open in Google Maps ↗
-          </a>
-        )}
-
-        {plan.ticket_url && (
-          <a
-            href={plan.ticket_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 block btn btn-primary"
-          >
-            Open ticket ↗
-          </a>
-        )}
-
-        {ticket?.signedUrl && (
-          <div className="mt-5 border-t border-black/[0.06] pt-5">
-            <p className="text-xs font-medium uppercase text-muted">Ticket</p>
-            <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
-              {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}
-              <img
-                src={ticket.signedUrl}
-                alt={`Ticket for ${plan.title}`}
-                className="max-h-96 w-full rounded-[12px] bg-background object-contain"
-              />
-            </a>
-            <p className="mt-1 text-center text-xs text-muted">Tap to open full size</p>
-            {isOwner && (
-              <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
-                <button type="submit" className="text-sm font-medium text-red-700">
-                  Remove photo
-                </button>
-              </form>
-            )}
-          </div>
-        )}
-
-        {isOwner && (
-          <TicketUpload tripId={day.trip_id} planId={plan.id} hasTicket={Boolean(plan.ticket_image)} />
+          <ul className="tile divide-y divide-black/[0.06] overflow-hidden">
+            {details.map((d) => {
+              const row = (
+                <>
+                  <span style={{ color: theme.strong }}>
+                    <Icon name={d.icon} className="h-6 w-6" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13px] text-muted">{d.label}</span>
+                    <span className={`block break-words ${d.href ? "" : "select-all"}`}>{d.value}</span>
+                  </span>
+                  {d.href && <span className="link text-sm">Open ↗</span>}
+                </>
+              );
+              return (
+                <li key={d.label}>
+                  {d.href ? (
+                    <a
+                      href={d.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-black/[0.02]"
+                    >
+                      {row}
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-4 px-6 py-4">{row}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
 
         {plan.notes && (
-          <p className="mt-5 whitespace-pre-wrap border-t border-black/[0.06] pt-5 leading-relaxed">
-            {plan.notes}
-          </p>
+          <section className="tile mt-4 p-6">
+            <p className="text-[13px] text-muted">Notes</p>
+            <p className="mt-1 whitespace-pre-wrap leading-relaxed">{plan.notes}</p>
+          </section>
         )}
-      </section>
 
-      {isOwner && (
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={`/trips/${day.trip_id}/plans/${plan.id}/edit`}
-            className="btn btn-secondary flex-1"
-          >
-            Edit plan
-          </Link>
-          <ConfirmDeleteButton
-            action={deletePlan.bind(null, day.trip_id, day.id, plan.id)}
-            label="Delete plan"
-            warning={`This deletes “${plan.title}”. This can’t be undone.`}
-          />
-        </div>
-      )}
+        {(ticket?.signedUrl || isOwner) && (
+          <section className="tile mt-4 p-6">
+            <p className="text-[13px] text-muted">Ticket photo</p>
+            {ticket?.signedUrl && (
+              <>
+                <a href={ticket.signedUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link */}
+                  <img
+                    src={ticket.signedUrl}
+                    alt={`Ticket for ${plan.title}`}
+                    className="max-h-[28rem] w-full rounded-[14px] bg-background object-contain"
+                  />
+                </a>
+                <p className="mt-2 text-center text-xs text-muted">Tap to open full size</p>
+                {isOwner && (
+                  <form action={removeTicketImage.bind(null, plan.id)} className="mt-2 text-center">
+                    <button type="submit" className="text-sm font-medium text-red-700 hover:underline">
+                      Remove photo
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
+            {isOwner && (
+              <TicketUpload tripId={day.trip_id} planId={plan.id} hasTicket={Boolean(plan.ticket_image)} />
+            )}
+          </section>
+        )}
+
+        {isOwner && (
+          <div className="mt-12 flex flex-wrap gap-3">
+            <Link href={`/trips/${day.trip_id}/plans/${plan.id}/edit`} className="btn btn-secondary flex-1">
+              <Icon name="pencil" className="h-5 w-5" />
+              Edit plan
+            </Link>
+            <ConfirmDeleteButton
+              action={deletePlan.bind(null, day.trip_id, day.id, plan.id)}
+              label="Delete plan"
+              warning={`This deletes “${plan.title}”. This can’t be undone.`}
+            />
+          </div>
+        )}
+      </div>
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { FieldError, errorProps, inputClass } from "@/components/form-field";
+import { TripScene } from "@/components/trip-scene";
 import { THEMES } from "@/lib/themes";
 import type { TripFormState } from "./actions";
 
@@ -34,7 +35,7 @@ export function TripForm({
 
   return (
     // noValidate: our own friendly messages replace the browser's pop-ups.
-    <form action={formAction} noValidate className="mt-6 flex flex-col gap-5">
+    <form action={formAction} noValidate className="flex flex-col gap-6">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         Trip name
         <input
@@ -73,8 +74,9 @@ export function TripForm({
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Trip color</legend>
-        <div className="mt-1.5 flex flex-wrap gap-2">
+        <legend className="text-sm font-medium">Scene</legend>
+        <p className="text-sm text-muted">Sets the trip&apos;s color and the picture on its pages.</p>
+        <div className="mt-2 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
           {Object.entries(THEMES).map(([value, theme]) => (
             <label key={value} className="cursor-pointer">
               <input
@@ -85,10 +87,14 @@ export function TripForm({
                 className="peer sr-only"
               />
               <span
-                className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm ring-[var(--ring)] peer-checked:ring-2 peer-focus-visible:outline-2 peer-focus-visible:outline-accent"
-                style={{ backgroundColor: theme.soft, color: theme.strong, ["--ring" as string]: theme.strong }}
+                className="block overflow-hidden rounded-[16px] ring-offset-2 transition-shadow peer-checked:ring-[3px] peer-checked:ring-[var(--ring)] peer-focus-visible:ring-[3px] peer-focus-visible:ring-accent"
+                style={{ ["--ring" as string]: theme.strong }}
               >
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: theme.strong }} />
+                <span className="relative block aspect-[4/3]">
+                  <TripScene theme={value} uid={`pick-${value}`} animated={false} className="absolute inset-0 h-full w-full" />
+                </span>
+              </span>
+              <span className="mt-1.5 block text-center text-[13px] font-medium" style={{ color: theme.ink }}>
                 {theme.label}
               </span>
             </label>

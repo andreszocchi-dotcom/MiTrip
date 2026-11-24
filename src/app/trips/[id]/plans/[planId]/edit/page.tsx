@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHero } from "@/components/page-hero";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updatePlan } from "../../../../plan-actions";
@@ -23,14 +24,16 @@ export default async function EditPlanPage({ params }: PageProps<"/trips/[id]/pl
   }
 
   return (
-    <main className="page">
-      <h1 className="headline">Edit plan</h1>
+    <main className="page !max-w-[640px]">
+      <PageHero title="Edit plan." />
+      <div className="tile p-6 sm:p-10">
       <PlanForm
         action={updatePlan.bind(null, plan.days.trip_id, plan.id)}
         plan={plan}
         submitLabel="Save changes"
         cancelHref={`/trips/${plan.days.trip_id}/plans/${plan.id}`}
       />
+      </div>
     </main>
   );
 }
