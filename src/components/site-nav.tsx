@@ -6,7 +6,7 @@ import { Logo } from "@/components/logo";
 
 // Pages for visitors who aren't logged in (the proxy keeps logged-in users
 // off them), so the nav can tell which links to show from the address alone.
-export const PUBLIC_PATHS = ["/", "/login", "/signup"];
+export const PUBLIC_PATHS = ["/", "/login", "/signup", "/privacy"];
 
 export const APP_LINKS = [
   { href: "/trips", label: "Trips" },
