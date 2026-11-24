@@ -46,7 +46,9 @@ export type Database = {
           id: number
           latitude: number | null
           longitude: number | null
+          place_from: string | null
           place_name: string | null
+          place_source: string | null
           summary: string | null
           timezone: string | null
           trip_id: number
@@ -57,7 +59,9 @@ export type Database = {
           id?: never
           latitude?: number | null
           longitude?: number | null
+          place_from?: string | null
           place_name?: string | null
+          place_source?: string | null
           summary?: string | null
           timezone?: string | null
           trip_id: number
@@ -68,7 +72,9 @@ export type Database = {
           id?: never
           latitude?: number | null
           longitude?: number | null
+          place_from?: string | null
           place_name?: string | null
+          place_source?: string | null
           summary?: string | null
           timezone?: string | null
           trip_id?: number

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayPlace, readPlace, shortPlace, todayIn } from "@/lib/places";
+import { dayPlace, placesForDays, readPlace, shortPlace, todayIn } from "@/lib/places";
 import { describeWeather } from "@/lib/weather";
 import { tripCountdown } from "@/lib/dates";
 
@@ -13,6 +13,19 @@ describe("places and time zones", () => {
     expect(dayPlace(none, sydney)?.place_name).toBe("Sydney, Australia");
     expect(dayPlace(none, none)).toBeNull();
     expect(shortPlace(sydney)).toBe("Sydney");
+  });
+
+  it("carries a city forward to the free days after it", () => {
+    const queenstown = { place_name: "Queenstown, New Zealand", latitude: -45.03, longitude: 168.66, timezone: "Pacific/Auckland" };
+    const names = placesForDays([none, sydney, none, queenstown, none, none], sydney).map((p) => p?.place_name);
+    expect(names).toEqual([
+      "Sydney, Australia",
+      "Sydney, Australia",
+      "Sydney, Australia",
+      "Queenstown, New Zealand",
+      "Queenstown, New Zealand",
+      "Queenstown, New Zealand",
+    ]);
   });
 
   it("knows it's already tomorrow in Sydney when it's evening in California", () => {

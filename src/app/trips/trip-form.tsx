@@ -84,7 +84,7 @@ export function TripForm({
           Main city <span className="font-normal text-muted">(optional)</span>
         </span>
         <span className="font-normal text-muted">
-          For weather and local time. Days in other cities can change it on their own page.
+          For weather and local time. MiTrip also finds each day&apos;s city from its plans&apos; addresses.
         </span>
         <PlacePicker defaultPlace={placeOf(values)} placeholder="Sydney, Lisbon, Tokyo…" />
       </div>

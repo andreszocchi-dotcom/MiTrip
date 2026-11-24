@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { after } from "next/server";
 import { DayPlace } from "@/components/day-place";
 import { DayStrip } from "@/components/day-strip";
 import { Icon } from "@/components/icons";
@@ -11,8 +12,9 @@ import { NextDayLabel, TodayBadge } from "@/components/today-link";
 import { WeatherBadge } from "@/components/weather-badge";
 import { SceneBanner } from "@/components/trip-scene";
 import { formatDay, formatTime } from "@/lib/dates";
+import { autoLocateTrip, needsLocating } from "@/lib/auto-locate";
 import { dayRouteLinks, routeStops } from "@/lib/maps";
-import { dayPlace, placeOf, shortPlace } from "@/lib/places";
+import { placeOf, placesForDays, shortPlace } from "@/lib/places";
 import { forecastFor } from "@/lib/weather";
 import { planTypeOf } from "@/lib/plan-types";
 import { sortPlansByTime } from "@/lib/plan-order";
@@ -36,7 +38,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const { data: day } = await supabase
     .from("days")
     .select(
-      "id, date, greeting, trip_id, place_name, latitude, longitude, timezone, trips(id, name, theme, owner_id, place_name, latitude, longitude, timezone), plans(*, stars(user_id))",
+      "id, date, greeting, trip_id, place_name, latitude, longitude, timezone, place_source, place_from, trips(id, name, theme, owner_id, place_name, latitude, longitude, timezone), plans(*, stars(user_id))",
     )
     .eq("id", Number(dayId))
     .eq("trip_id", Number(id))
@@ -47,7 +49,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
 
   const { data: tripDays } = await supabase
     .from("days")
-    .select("id, date, plans(count)")
+    .select("id, date, place_name, latitude, longitude, timezone, plans(count)")
     .eq("trip_id", day.trip_id)
     .order("date");
   const stripDays = (tripDays ?? []).map((d) => ({
@@ -78,9 +80,24 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const routeLinks = dayRouteLinks(stops);
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
 
-  // Where this day happens (its own city, else the trip's), for weather and
-  // local time.
-  const place = dayPlace(day, trip);
+  // Where this day happens: its own city (found from its plans' addresses,
+  // or picked by hand), else the trip's. A day not yet located is looked up
+  // now (about a second, once), and the rest of the trip in the background.
+  if (isOwner) {
+    if (needsLocating(day)) {
+      await autoLocateTrip(supabase, trip.id, { onlyDayId: day.id });
+      const { data: fresh } = await supabase
+        .from("days")
+        .select("place_name, latitude, longitude, timezone, place_source")
+        .eq("id", day.id)
+        .maybeSingle();
+      if (fresh) Object.assign(day, fresh);
+    }
+    after(() => autoLocateTrip(supabase, trip.id));
+  }
+  // No city of its own: the last city before this day (else the trip's).
+  const place =
+    placeOf(day) ?? placesForDays((tripDays ?? []).slice(0, index), trip).at(-1) ?? placeOf(trip);
   const weather = place ? ((await forecastFor(place)).get(day.date) ?? null) : null;
 
   // The stops as the route panel lists them: the first plan at each place.
@@ -138,8 +155,7 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
             tripId={trip.id}
             dayId={day.id}
             place={place}
-            ownPlace={placeOf(day)}
-            tripPlace={placeOf(trip)}
+            source={day.place_source}
             canEdit={isOwner}
           />
           {place && (

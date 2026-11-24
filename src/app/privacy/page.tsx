@@ -61,6 +61,11 @@ export default function PrivacyPage() {
             Claude model can sort the items into days. Nothing else is sent to Anthropic.
           </p>
           <p>
+            <strong>OpenStreetMap</strong> (its Nominatim service) receives a day&apos;s first plan address to find
+            which city the day is in. <strong>Open-Meteo</strong> receives that city&apos;s coordinates to send back
+            the weather and time zone. No account details go to either.
+          </p>
+          <p>
             <strong>Google</strong> handles &ldquo;Continue with Google&rdquo; if you choose it. Address links open
             Google Maps, which follows Google&apos;s own privacy policy.
           </p>
@@ -99,7 +104,7 @@ export default function PrivacyPage() {
             </a>
             . MiTrip isn&apos;t meant for children under 13. If this policy changes, the date below will change too.
           </p>
-          <p className="text-sm text-muted">Last updated November 23, 2026.</p>
+          <p className="text-sm text-muted">Last updated November 24, 2026.</p>
         </Section>
       </div>
     </main>

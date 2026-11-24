@@ -59,6 +59,17 @@ export function SiteFooter() {
           )}
           <p className="mt-8 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
             <span>MiTrip · Made for the trip, one day at a time.</span>
+            <span>
+              Weather by{" "}
+              <a href="https://open-meteo.com" className="hover:text-foreground hover:underline">
+                Open-Meteo
+              </a>{" "}
+              · Places ©{" "}
+              <a href="https://www.openstreetmap.org/copyright" className="hover:text-foreground hover:underline">
+                OpenStreetMap
+              </a>{" "}
+              contributors
+            </span>
             <Link href="/privacy" className="hover:text-foreground hover:underline">
               Privacy
             </Link>

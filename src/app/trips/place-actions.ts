@@ -39,8 +39,9 @@ export async function searchPlaces(query: string): Promise<Place[]> {
   }
 }
 
-// Sets (or, with null, clears) one day's own place. Row Level Security only
-// lets the trip's owner change its days.
+// Sets one day's city by hand (never overwritten by the automatic lookup),
+// or, with null, hands it back to the automatic lookup from its plans' addresses.
+// Row Level Security only lets the trip's owner change its days.
 export async function setDayPlace(tripId: number, dayId: number, place: Place | null) {
   if (place && (!isValidTimeZone(place.timezone) || Math.abs(place.latitude) > 90 || Math.abs(place.longitude) > 180)) {
     return;
@@ -48,7 +49,11 @@ export async function setDayPlace(tripId: number, dayId: number, place: Place | 
   const supabase = await createClient();
   await supabase
     .from("days")
-    .update(place ? { ...place, place_name: place.place_name.slice(0, 120) } : NO_PLACE)
+    .update(
+      place
+        ? { ...place, place_name: place.place_name.slice(0, 120), place_source: "manual", place_from: null }
+        : { ...NO_PLACE, place_source: null, place_from: null },
+    )
     .eq("id", dayId)
     .eq("trip_id", tripId);
   refresh();

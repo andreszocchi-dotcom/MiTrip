@@ -5,23 +5,22 @@ import { setDayPlace } from "@/app/trips/place-actions";
 import { PlacePicker } from "@/components/place-picker";
 import { shortPlace, type Place } from "@/lib/places";
 
-// The day's city under its date: "📍 Sydney". The trip's owner can tap
-// Change to set a different city for just this day, or go back to the trip's.
+// The day's city under its date: "📍 Sydney". It's normally found from the
+// day's plan addresses; the trip's owner can tap Change to pick one by hand,
+// or hand it back to the automatic lookup.
 export function DayPlace({
   tripId,
   dayId,
   place,
-  ownPlace,
-  tripPlace,
+  source,
   canEdit,
 }: {
   tripId: number;
   dayId: number;
   // The city in effect (the day's own, else the trip's).
   place: Place | null;
-  // Set only when this day has its own city.
-  ownPlace: Place | null;
-  tripPlace: Place | null;
+  // How the day's own city was set: from its plans ("auto") or by hand.
+  source: string | null;
   canEdit: boolean;
 }) {
   const [editing, setEditing] = useState(false);
@@ -43,9 +42,9 @@ export function DayPlace({
           onChange={(next) => next && save(next)}
         />
         <div className="mt-2 flex justify-center gap-5 text-sm">
-          {ownPlace && tripPlace && (
+          {source === "manual" && (
             <button type="button" onClick={() => save(null)} className="link" disabled={pending}>
-              Use the trip&apos;s city ({shortPlace(tripPlace)})
+              Find it from this day&apos;s plans
             </button>
           )}
           <button type="button" onClick={() => setEditing(false)} className="link" disabled={pending}>

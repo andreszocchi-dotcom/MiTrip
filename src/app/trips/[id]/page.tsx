@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { after } from "next/server";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { DayStrip } from "@/components/day-strip";
 import { LocalTime } from "@/components/local-time";
@@ -11,8 +12,9 @@ import { SubNav } from "@/components/sub-nav";
 import { TodayLink } from "@/components/today-link";
 import { TripCountdown } from "@/components/trip-countdown";
 import { SceneBanner } from "@/components/trip-scene";
+import { autoLocateTrip } from "@/lib/auto-locate";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
-import { dayPlace, placeOf, shortPlace } from "@/lib/places";
+import { placeOf, placesForDays, shortPlace } from "@/lib/places";
 import { weatherForDays } from "@/lib/weather";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
@@ -95,9 +97,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   const totalPlans = trip.days.reduce((sum, day) => sum + (day.plans[0]?.count ?? 0), 0);
   const dayCount = countDays(trip.start_date, trip.end_date);
 
+  // Find days' cities from their plans' addresses in the background (only
+  // the owner can save them), for weather and local time on later visits.
+  if (isOwner) after(() => autoLocateTrip(supabase, trip.id));
+
   // Each day's city (its own, else the trip's) and forecast, where there is one.
   const tripPlace = placeOf(trip);
-  const dayWeather = await weatherForDays(trip.days.map((d) => ({ date: d.date, place: dayPlace(d, trip) })));
+  const dayPlaces = placesForDays(trip.days, trip);
+  const dayWeather = await weatherForDays(trip.days.map((d, i) => ({ date: d.date, place: dayPlaces[i] })));
 
   return (
     <main className="flex flex-1 flex-col">
@@ -202,7 +209,9 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
             {trip.days.map((day, index) => {
               const planCount = day.plans[0]?.count ?? 0;
               const weather = dayWeather[index];
-              const ownPlace = placeOf(day);
+              // Show a day's city only when it differs from the trip's.
+              const here = dayPlaces[index];
+              const showPlace = here && here.place_name !== trip.place_name ? here : null;
               return (
                 <li key={day.id}>
                   <Link
@@ -217,9 +226,9 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">{formatDay(day.date)}</span>
-                      {(day.greeting || ownPlace) && (
+                      {(day.greeting || showPlace) && (
                         <span className="block truncate text-sm text-muted">
-                          {ownPlace && `📍 ${shortPlace(ownPlace)}${day.greeting ? " · " : ""}`}
+                          {showPlace && `📍 ${shortPlace(showPlace)}${day.greeting ? " · " : ""}`}
                           {day.greeting}
                         </span>
                       )}

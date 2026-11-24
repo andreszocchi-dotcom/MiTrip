@@ -29,6 +29,17 @@ export function dayPlace(day: MaybePlace, trip: MaybePlace) {
   return placeOf(day) ?? placeOf(trip);
 }
 
+// Every day's place in date order. A day without its own city (say, a free
+// day) carries forward the last city before it, since you're probably still
+// there; days before any city use the trip's.
+export function placesForDays(days: MaybePlace[], trip: MaybePlace) {
+  let last = placeOf(trip);
+  return days.map((day) => {
+    last = placeOf(day) ?? last;
+    return last;
+  });
+}
+
 // The short city name shown in the app: "Queenstown, New Zealand" -> "Queenstown".
 export function shortPlace(place: Place) {
   return place.place_name.split(",")[0].trim();
