@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Reveal } from "@/components/reveal";
-import { SceneBanner, TripScene } from "@/components/trip-scene";
+import { TripScene } from "@/components/trip-scene";
 import { THEMES } from "@/lib/themes";
 
-// Sample day shown in the phone on the landing page: a small copy of the
-// real day page (scene header, route panel, timeline).
+// Sample day shown in the phone on the landing page: what a day in MiTrip
+// looks like, with each plan's buttons (Maps, ticket, star) visible.
 const SAMPLE_PLANS = [
   { time: "8:30 AM", icon: "🏨", title: "Breakfast at the hotel", place: "Park Hyatt Sydney" },
-  { time: "10:00 AM", icon: "🎟️", title: "Opera House tour", place: "Sydney Opera House" },
+  { time: "10:00 AM", icon: "🎟️", title: "Opera House tour", place: "Sydney Opera House", ticket: true, starred: true },
   { time: "1:00 PM", icon: "📍", title: "Bondi to Coogee walk", place: "Bondi Beach" },
-  { time: "7:30 PM", icon: "🍽️", title: "Dinner at Aria", place: "1 Macquarie St" },
+  { time: "7:30 PM", icon: "🍽️", title: "Dinner at Aria", place: "1 Macquarie St", confirmation: "ARIA-2210" },
 ];
 
 function PhoneMock() {
@@ -18,67 +18,58 @@ function PhoneMock() {
   return (
     <div className="mx-auto w-[300px] rounded-[48px] bg-ink p-3 text-left sm:w-[340px]">
       <div className="relative h-[600px] overflow-hidden rounded-[38px] bg-background sm:h-[660px]">
-        {/* Status bar island and the trip's sticky bar */}
-        <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-3">
+        <div className="flex justify-center pt-3">
           <div className="h-6 w-24 rounded-full bg-ink" />
         </div>
-        <div className="border-b border-black/[0.06] bg-[rgb(251_251_253/0.9)] px-4 pb-2 pt-11">
-          <p className="text-[13px] font-semibold tracking-[-0.01em]">Australia-NZ Honeymoon</p>
-        </div>
-
-        {/* Day header on the scene's sky */}
-        <div style={{ backgroundColor: ocean.sky, color: ocean.ink }}>
-          <div className="px-4 pt-5 text-center">
-            <p className="text-[10px] font-semibold opacity-80">Day 3 · Today</p>
-            <p className="mt-0.5 text-[26px] font-semibold leading-none tracking-[-0.03em]">Sun, Jan 10</p>
-            <p className="mt-1.5 text-[11px] opacity-85">Harbour morning, beach afternoon.</p>
-          </div>
-          <SceneBanner theme="ocean" uid="phone-ocean" sky={ocean.sky} className="mt-2 aspect-[2/1]" />
-        </div>
-
         <div className="px-3 pt-3">
-          {/* Today's route */}
-          <div className="rounded-[18px] bg-ink p-4 text-white">
-            <p className="text-[9px] font-semibold text-white/60">Today&apos;s route</p>
-            <p className="mt-0.5 text-[17px] font-semibold leading-tight tracking-[-0.02em]">
-              4 stops. <span className="text-white/60">One tap.</span>
+          {/* Day header */}
+          <div className="rounded-[20px] px-4 py-3.5" style={{ backgroundColor: ocean.soft }}>
+            <p className="text-[10px] font-semibold" style={{ color: ocean.strong }}>
+              Day 3 of 14 · Today
             </p>
-            <ol className="mt-2.5 flex flex-col gap-1.5">
-              {SAMPLE_PLANS.map((plan, i) => (
-                <li key={plan.title} className="flex items-center gap-2">
-                  <span
-                    className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-semibold"
-                    style={{ backgroundColor: ocean.sky, color: ocean.ink }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="truncate text-[11px]">{plan.title}</span>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-3 rounded-full bg-white py-1.5 text-center text-[10px] font-medium text-ink">
-              Open in Google Maps
-            </div>
+            <p className="mt-0.5 text-[20px] font-semibold leading-tight tracking-[-0.02em]">Sun, Jan 10</p>
+            <p className="mt-0.5 text-[11px] text-foreground/80">Harbour morning, beach afternoon.</p>
           </div>
 
-          {/* The plan, as a timeline */}
-          <p className="mt-4 text-[17px] font-semibold tracking-[-0.02em]">The plan.</p>
-          <ul className="relative mt-2 flex flex-col gap-2 pl-4">
-            <span aria-hidden="true" className="absolute bottom-0 left-[5px] top-3 w-px" style={{ backgroundColor: ocean.soft }} />
+          {/* The day's route, one tap */}
+          <div className="mt-2.5 flex items-center justify-center gap-1.5 rounded-full bg-accent py-2 text-[11px] font-medium text-white">
+            Open the day&apos;s 4 stops in Google Maps ↗
+          </div>
+
+          {/* The plans, each with its buttons */}
+          <ul className="mt-2.5 flex flex-col gap-2">
             {SAMPLE_PLANS.map((plan) => (
-              <li key={plan.title} className="relative flex gap-2.5 rounded-[14px] bg-surface p-2.5">
-                <span
-                  aria-hidden="true"
-                  className="absolute -left-[14px] top-4 h-2 w-2 rounded-full ring-2 ring-background"
-                  style={{ backgroundColor: ocean.strong }}
-                />
-                <span aria-hidden="true" className="text-sm">
-                  {plan.icon}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[9px] text-muted">{plan.time}</p>
-                  <p className="truncate text-[12px] font-semibold">{plan.title}</p>
-                  <p className="truncate text-[9px] text-muted">{plan.place}</p>
+              <li key={plan.title} className="overflow-hidden rounded-[16px] bg-surface">
+                <div className="flex gap-2.5 px-3 pb-2 pt-2.5">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background text-[13px]"
+                  >
+                    {plan.icon}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] text-muted">{plan.time}</p>
+                    <p className="truncate text-[12.5px] font-semibold leading-tight">{plan.title}</p>
+                    <p className="truncate text-[9.5px] text-muted">{plan.place}</p>
+                    {plan.confirmation && (
+                      <p className="mt-0.5 text-[9px] text-muted">
+                        Confirmation: <span className="font-medium text-foreground">{plan.confirmation}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {plan.ticket && (
+                  <div className="mx-3 mb-2 rounded-full bg-accent py-1.5 text-center text-[10px] font-medium text-white">
+                    Open ticket ↗
+                  </div>
+                )}
+                <div className="flex border-t border-black/[0.06] text-[10px] font-medium">
+                  <span className={`flex-1 py-1.5 text-center ${plan.starred ? "text-amber-600" : "text-muted"}`}>
+                    {plan.starred ? "★ Starred" : "☆ Star"}
+                  </span>
+                  <span className="flex-[2] border-l border-black/[0.06] py-1.5 text-center text-accent">
+                    Open in Google Maps ↗
+                  </span>
                 </div>
               </li>
             ))}
@@ -86,7 +77,7 @@ function PhoneMock() {
         </div>
 
         {/* Fade out at the bottom of the screen, plus the home bar */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute inset-x-0 bottom-2 flex justify-center">
           <div className="h-1 w-24 rounded-full bg-ink/80" />
         </div>
