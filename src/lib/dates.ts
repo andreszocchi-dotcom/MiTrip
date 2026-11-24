@@ -35,3 +35,12 @@ export function formatTime(time: string) {
   const suffix = h < 12 ? "AM" : "PM";
   return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${suffix}`;
 }
+
+// A trip's countdown line: "In 46 days", "Tomorrow", "Happening now", or
+// "Ended". today is "YYYY-MM-DD" in the viewer's own time zone.
+export function tripCountdown(start: string, end: string, today: string) {
+  if (today > end) return "Ended";
+  if (today >= start) return "Happening now";
+  const days = Math.round((toDate(start).getTime() - toDate(today).getTime()) / 86_400_000);
+  return days === 1 ? "Tomorrow" : `In ${days} days`;
+}

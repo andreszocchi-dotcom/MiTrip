@@ -27,7 +27,7 @@ export async function People({
 
   return (
     <section className="tile p-6 sm:p-8">
-      <h2 className="section-title">{isOwner ? "Share this trip" : "People on this trip"}</h2>
+      <h2 className="section-title">{isOwner ? "Invite link" : "People"}</h2>
 
       {isOwner && (
         <>

@@ -195,6 +195,34 @@ body {
   }
 }
 
+/* Trip scenes (components/trip-scene.tsx): slow, quiet motion. Waves drift
+   one canvas-width-safe step and loop; clouds and fog sway; light pulses. */
+.scene * {
+  transform-box: fill-box;
+}
+.scene-drift-slow { animation: scene-drift 26s linear infinite; }
+.scene-drift { animation: scene-drift-160 16s linear infinite; }
+.scene-drift-fast { animation: scene-drift 12s linear infinite; }
+.scene-sway { animation: scene-sway 9s ease-in-out infinite alternate; }
+.scene-sway-slow { animation: scene-sway 16s ease-in-out infinite alternate; }
+.scene-bob { transform-origin: 50% 100%; animation: scene-bob 4.5s ease-in-out infinite; }
+.scene-shimmer { animation: scene-shimmer 3.2s ease-in-out infinite; }
+.scene-shimmer-alt { animation: scene-shimmer 3.2s ease-in-out 1.6s infinite; }
+.scene-pulse { animation: scene-pulse 6s ease-in-out infinite; }
+.scene-glide { animation: scene-glide 14s ease-in-out infinite alternate; }
+.scene-still * { animation: none !important; }
+
+@keyframes scene-drift { to { transform: translateX(-400px); } }
+@keyframes scene-drift-160 { to { transform: translateX(-480px); } }
+@keyframes scene-sway { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+@keyframes scene-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-2deg); }
+}
+@keyframes scene-shimmer { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes scene-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
+@keyframes scene-glide { from { transform: translate(-20px, 4px); } to { transform: translate(40px, -6px); } }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
@@ -203,6 +231,9 @@ body {
   }
   * {
     scroll-behavior: auto !important;
+  }
+  .scene * {
+    animation: none !important;
   }
 }
 

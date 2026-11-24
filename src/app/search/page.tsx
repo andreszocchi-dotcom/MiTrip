@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Icon } from "@/components/icons";
+import { PageHero } from "@/components/page-hero";
 import { PlanCard } from "@/components/plan-card";
 import { formatDay, formatTime } from "@/lib/dates";
 import { PLAN_TYPES } from "@/lib/plan-types";
@@ -63,25 +65,28 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
 
   return (
     <main className="page">
-      <h1 className="headline">Search</h1>
+      <PageHero title="Search." subtitle="Every plan, across every trip." />
 
       {/* A plain GET form: submitting it just updates the page address. */}
-      <form action="/search" className="mt-8 flex flex-col gap-4">
-        <div className="flex gap-2">
+      <form action="/search" className="flex flex-col gap-5">
+        <div className="relative">
+          <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-muted">
+            <Icon name="search" className="h-6 w-6" />
+          </span>
           <input
             name="q"
             type="search"
             defaultValue={q}
-            placeholder="Search titles, places, notes"
+            placeholder="Titles, places, notes, confirmation numbers"
             aria-label="Search plans"
-            className="field flex-1"
+            className="h-16 w-full rounded-full border border-line bg-surface pl-14 pr-28 text-[19px] outline-none transition-shadow focus:border-accent focus:shadow-[0_0_0_4px_rgb(47_116_181/0.18)]"
           />
-          <button type="submit" className="btn btn-primary btn-sm">
+          <button type="submit" className="btn btn-primary btn-sm absolute right-2.5 top-1/2 -translate-y-1/2">
             Search
           </button>
         </div>
 
-        <fieldset className="flex flex-wrap gap-2">
+        <fieldset className="flex flex-wrap justify-center gap-2">
           <legend className="sr-only">Type</legend>
           {[["", { label: "All", icon: "" }] as const, ...Object.entries(PLAN_TYPES)].map(
             ([value, t]) => (

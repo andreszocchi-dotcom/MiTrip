@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { StarButton } from "@/components/star-button";
-import { ThemeArt } from "@/components/theme-art";
-import { TodayLink } from "@/components/today-link";
-import { countDays, formatDateRange } from "@/lib/dates";
+import { PageHero } from "@/components/page-hero";
+import { TripCard } from "@/components/trip-card";
+import { todayIso } from "@/lib/dashboard-stats";
 import { createClient } from "@/lib/supabase/server";
-import { themeOf } from "@/lib/themes";
 
 export const metadata: Metadata = { title: "My trips · MiTrip" };
 
@@ -26,62 +24,67 @@ export default async function TripsPage() {
     .order("start_date")
     .order("date", { referencedTable: "days" });
 
-  // Starred trips first, then by start date. Row Level Security returns only
-  // my own stars, so any trip_stars row here is mine.
-  const sorted = [...(trips ?? [])].sort(
-    (a, b) => Number(b.trip_stars.length > 0) - Number(a.trip_stars.length > 0),
+  const all = trips ?? [];
+  const today = todayIso();
+  const current = all.filter((t) => t.end_date >= today);
+  const past = all.filter((t) => t.end_date < today).reverse();
+
+  // The trip happening now (or the soonest one ahead) gets the big card.
+  // The rest: starred first, then by start date. Row Level Security returns
+  // only my own stars, so any trip_stars row here is mine.
+  const featured = current[0];
+  const rest = current
+    .slice(1)
+    .sort((a, b) => Number(b.trip_stars.length > 0) - Number(a.trip_stars.length > 0));
+
+  const card = (trip: (typeof all)[number], feature = false) => (
+    <TripCard
+      key={trip.id}
+      trip={trip}
+      feature={feature}
+      starred={trip.trip_stars.length > 0}
+      shared={trip.owner_id !== user.id}
+    />
   );
 
   return (
-    <main className="page">
-      <div className="mt-8 flex items-center justify-between gap-4">
-        <h1 className="headline">My trips</h1>
-        <Link href="/trips/new" className="btn btn-primary btn-sm shrink-0">
-          Add trip
+    <main className="page !max-w-[1100px]">
+      <PageHero
+        title="Your trips."
+        subtitle={all.length > 0 ? "Every plan, sorted into the day it happens." : "Plan your first one in a minute."}
+      >
+        <Link href="/trips/new" className="btn btn-primary">
+          Add a trip
         </Link>
-      </div>
-      <p className="mt-2 truncate text-sm text-muted">Signed in as {user.email}</p>
+      </PageHero>
 
-      {sorted.length > 0 ? (
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
-          {sorted.map((trip) => {
-            const theme = themeOf(trip.theme);
-            return (
-              <li key={trip.id} className="relative">
-                <Link
-                  href={`/trips/${trip.id}`}
-                  className="relative isolate flex min-h-60 flex-col justify-between overflow-hidden rounded-[28px] p-7 pb-24 transition-transform active:scale-[0.99]"
-                  style={{ backgroundColor: theme.soft }}
-                >
-                  <p className="pr-10 text-[28px] font-semibold leading-tight tracking-[-0.02em]" style={{ color: theme.strong }}>
-                    {trip.name}
-                  </p>
-                  <p className="mt-6 text-foreground">
-                    {formatDateRange(trip.start_date, trip.end_date)}
-                    <span className="text-muted">
-                      {" · "}
-                      {countDays(trip.start_date, trip.end_date)} days
-                    </span>
-                  </p>
-                  {trip.owner_id !== user.id && (
-                    <p className="mt-2 text-sm text-muted">Shared with you</p>
-                  )}
-                  <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-20 w-full" />
-                </Link>
-                <div className="absolute right-4 top-4">
-                  <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="icon" />
-                </div>
-                <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <div className="tile mt-10 p-10 text-center">
-          <p className="text-lg font-medium">No trips yet</p>
-          <p className="mt-2 text-muted">Tap “Add trip” to plan your first one.</p>
+      {all.length === 0 && (
+        <div className="tile mx-auto w-full max-w-[640px] p-10 text-center">
+          <p className="section-title">Where to?</p>
+          <p className="mt-2 text-muted">
+            Add a trip with its dates and MiTrip makes a page for every day. Paste an itinerary and AI
+            fills the days in for you.
+          </p>
         </div>
       )}
+
+      {featured && <ul>{card(featured, true)}</ul>}
+
+      {rest.length > 0 && (
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2">{rest.map((trip) => card(trip))}</ul>
+      )}
+
+      {past.length > 0 && (
+        <section className="mt-20">
+          <h2 className="section-title text-center">Past trips</h2>
+          <p className="mt-1 text-center text-muted">Still here whenever you want to look back.</p>
+          <ul className="mt-8 grid gap-4 opacity-90 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map((trip) => card(trip))}
+          </ul>
+        </section>
+      )}
+
+      <p className="mt-16 text-center text-xs text-muted">Signed in as {user.email}</p>
     </main>
   );
 }

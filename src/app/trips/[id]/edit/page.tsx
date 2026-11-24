@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHero } from "@/components/page-hero";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateTrip } from "../../actions";
@@ -23,14 +24,16 @@ export default async function EditTripPage({ params }: PageProps<"/trips/[id]/ed
   }
 
   return (
-    <main className="page">
-      <h1 className="headline">Edit trip</h1>
+    <main className="page !max-w-[640px]">
+      <PageHero title="Edit trip." />
+      <div className="tile p-6 sm:p-10">
       <TripForm
         action={updateTrip.bind(null, trip.id)}
         trip={trip}
         submitLabel="Save changes"
         cancelHref={`/trips/${trip.id}`}
       />
+      </div>
     </main>
   );
 }

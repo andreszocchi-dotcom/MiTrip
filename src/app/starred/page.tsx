@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PlanCard } from "@/components/plan-card";
-import { StarButton } from "@/components/star-button";
-import { formatDateRange, formatDay, formatTime } from "@/lib/dates";
+import { PageHero } from "@/components/page-hero";
+import { TripCard } from "@/components/trip-card";
+import { formatDay, formatTime } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { themeOf } from "@/lib/themes";
 
@@ -41,44 +41,23 @@ export default async function StarredPage() {
     );
 
   return (
-    <main className="page">
-      <h1 className="headline">Starred</h1>
-      <p className="subhead mt-2 !text-[19px]">
-        Your quick list for tickets, boarding passes, and must-dos.
-      </p>
+    <main className="page !max-w-[980px]">
+      <PageHero title="Starred." subtitle="Boarding passes, tickets, and must-dos, one tap away." />
 
       {starredTrips.length > 0 && (
-        <section className="mt-10">
-          <h2 className="section-title">Trips</h2>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-            {starredTrips.map((trip) => {
-              const theme = themeOf(trip.theme);
-              return (
-                <li key={trip.id} className="relative">
-                  <Link
-                    href={`/trips/${trip.id}`}
-                    className="block rounded-[22px] p-6 pr-16 transition-transform active:scale-[0.99]"
-                    style={{ backgroundColor: theme.soft }}
-                  >
-                    <p className="text-[21px] font-semibold tracking-[-0.02em]" style={{ color: theme.strong }}>
-                      {trip.name}
-                    </p>
-                    <p className="mt-1 text-sm">{formatDateRange(trip.start_date, trip.end_date)}</p>
-                  </Link>
-                  <div className="absolute right-3 top-3">
-                    <StarButton tripId={trip.id} starred size="icon" />
-                  </div>
-                </li>
-              );
-            })}
+        <section>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {starredTrips.map((trip) => (
+              <TripCard key={trip.id} trip={trip} starred />
+            ))}
           </ul>
         </section>
       )}
 
-      {starredTrips.length > 0 && starred.length > 0 && <h2 className="section-title mt-12">Plans</h2>}
+      {starredTrips.length > 0 && starred.length > 0 && <h2 className="headline mt-20 text-center">Plans.</h2>}
 
       {starred.length > 0 ? (
-        <ul className={`${starredTrips.length > 0 ? "mt-4" : "mt-10"} flex flex-col gap-3`}>
+        <ul className={`mx-auto w-full max-w-[720px] ${starredTrips.length > 0 ? "mt-8" : ""} flex flex-col gap-3`}>
           {starred.map((plan) => {
             const day = plan.days!;
             const trip = day.trips!;
@@ -99,7 +78,7 @@ export default async function StarredPage() {
         </ul>
       ) : (
         starredTrips.length === 0 && (
-        <div className="tile mt-10 p-10 text-center">
+        <div className="tile mx-auto w-full max-w-[640px] p-10 text-center">
           <p className="text-3xl" aria-hidden="true">☆</p>
           <p className="mt-2 font-medium">Nothing starred yet</p>
           <p className="mt-1 text-sm text-muted">

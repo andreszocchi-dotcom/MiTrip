@@ -39,7 +39,7 @@ export function PlanForm({
 
   return (
     // noValidate: our own friendly messages replace the browser's pop-ups.
-    <form action={formAction} noValidate className="mt-6 flex flex-col gap-5">
+    <form action={formAction} noValidate className="flex flex-col gap-6">
       <fieldset className="flex flex-col gap-2" {...errorProps("type", errors.type)}>
         <legend className="text-sm font-medium">Type</legend>
         <div className="mt-1.5 flex flex-wrap gap-2">
@@ -52,7 +52,7 @@ export function PlanForm({
                 defaultChecked={(values?.type ?? "activity") === value}
                 className="peer sr-only"
               />
-              <span className="flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-1.5 text-sm transition-colors peer-checked:bg-foreground peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
+              <span className="flex items-center gap-1.5 rounded-full bg-background px-3.5 py-1.5 text-sm transition-colors peer-checked:bg-foreground peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
                 <span aria-hidden="true">{type.icon}</span>
                 {type.label}
               </span>
