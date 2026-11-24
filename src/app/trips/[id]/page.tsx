@@ -7,6 +7,7 @@ import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange, formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { StarButton } from "@/components/star-button";
 import { themeOf } from "@/lib/themes";
 import { deleteTrip } from "../actions";
 import { ImportButton } from "./import-button";
@@ -29,7 +30,7 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
   // so another user's trip shows "Trip not found".
   const { data: trip } = await supabase
     .from("trips")
-    .select("*, days(id, date, greeting, plans(count))")
+    .select("*, trip_stars(user_id), days(id, date, greeting, plans(count))")
     .eq("id", Number(id))
     .order("date", { referencedTable: "days" })
     .maybeSingle();
@@ -49,9 +50,14 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
 
       <section className="relative isolate mt-4 overflow-hidden rounded-[28px] p-7 pb-24 sm:p-10 sm:pb-28" style={{ backgroundColor: theme.soft }}>
         <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-28 w-full" />
-        <h1 className="headline-lg" style={{ color: theme.strong }}>
-          {trip.name}
-        </h1>
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="headline-lg" style={{ color: theme.strong }}>
+            {trip.name}
+          </h1>
+          <div className="-mr-2 -mt-2 shrink-0 sm:mr-0 sm:mt-0">
+            <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="icon" />
+          </div>
+        </div>
         <p className="mt-3 text-[19px] text-foreground">
           {formatDateRange(trip.start_date, trip.end_date)}
           <span className="text-muted">

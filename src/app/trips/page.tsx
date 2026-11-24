@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { StarButton } from "@/components/star-button";
 import { ThemeArt } from "@/components/theme-art";
 import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange } from "@/lib/dates";
@@ -21,9 +22,15 @@ export default async function TripsPage() {
   // Row Level Security returns only trips I own or was invited to.
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, name, start_date, end_date, theme, owner_id, days(id, date)")
+    .select("id, name, start_date, end_date, theme, owner_id, days(id, date), trip_stars(user_id)")
     .order("start_date")
     .order("date", { referencedTable: "days" });
+
+  // Starred trips first, then by start date. Row Level Security returns only
+  // my own stars, so any trip_stars row here is mine.
+  const sorted = [...(trips ?? [])].sort(
+    (a, b) => Number(b.trip_stars.length > 0) - Number(a.trip_stars.length > 0),
+  );
 
   return (
     <main className="page">
@@ -35,18 +42,18 @@ export default async function TripsPage() {
       </div>
       <p className="mt-2 truncate text-sm text-muted">Signed in as {user.email}</p>
 
-      {trips && trips.length > 0 ? (
+      {sorted.length > 0 ? (
         <ul className="mt-10 grid gap-4 sm:grid-cols-2">
-          {trips.map((trip) => {
+          {sorted.map((trip) => {
             const theme = themeOf(trip.theme);
             return (
-              <li key={trip.id}>
+              <li key={trip.id} className="relative">
                 <Link
                   href={`/trips/${trip.id}`}
                   className="relative isolate flex min-h-60 flex-col justify-between overflow-hidden rounded-[28px] p-7 pb-24 transition-transform active:scale-[0.99]"
                   style={{ backgroundColor: theme.soft }}
                 >
-                  <p className="text-[28px] font-semibold leading-tight tracking-[-0.02em]" style={{ color: theme.strong }}>
+                  <p className="pr-10 text-[28px] font-semibold leading-tight tracking-[-0.02em]" style={{ color: theme.strong }}>
                     {trip.name}
                   </p>
                   <p className="mt-6 text-foreground">
@@ -61,6 +68,9 @@ export default async function TripsPage() {
                   )}
                   <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-20 w-full" />
                 </Link>
+                <div className="absolute right-4 top-4">
+                  <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="icon" />
+                </div>
                 <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
               </li>
             );
