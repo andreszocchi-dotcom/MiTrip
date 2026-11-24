@@ -21,7 +21,7 @@ export function SiteNav() {
   const isPublic = PUBLIC_PATHS.includes(pathname);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-[rgb(251_251_253/0.78)] backdrop-blur-xl backdrop-saturate-150 print:hidden">
+    <header className="sticky top-0 z-50 border-b border-foreground/[0.06] bg-nav backdrop-blur-xl backdrop-saturate-150 print:hidden">
       <div className="mx-auto flex h-12 max-w-[980px] items-center justify-between gap-4 px-4 sm:px-6">
         <Link href={isPublic ? "/" : "/trips"} aria-label="MiTrip home" className="shrink-0">
           <Logo className="h-[22px] w-auto" />

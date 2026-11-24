@@ -50,7 +50,7 @@ export function DayStrip({
                 aria-current={isCurrent ? "page" : undefined}
                 aria-label={`Day ${index + 1}, ${weekday(day.date)} ${month(day.date)} ${Number(day.date.slice(8))}, ${day.planCount} plans`}
                 className={`flex w-12 flex-col items-center rounded-[14px] py-2 transition-colors ${
-                  isCurrent ? "text-white" : "bg-surface text-foreground hover:bg-white/60"
+                  isCurrent ? "text-white" : "bg-surface text-foreground hover:bg-foreground/[0.04]"
                 }`}
                 style={isCurrent ? { backgroundColor: color } : undefined}
               >

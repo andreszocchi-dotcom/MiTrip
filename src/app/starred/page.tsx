@@ -70,7 +70,7 @@ export default async function StarredPage() {
                 showTicket
                 context={{
                   text: `${trip.name} · ${formatDay(day.date)}${plan.start_time ? ` · ${formatTime(plan.start_time)}` : ""}`,
-                  color: themeOf(trip.theme).strong,
+                  theme: themeOf(trip.theme),
                 }}
               />
             );

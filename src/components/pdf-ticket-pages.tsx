@@ -86,7 +86,7 @@ export function PdfTicketPages({
           key={i}
           src={src}
           alt={pages.length > 1 ? `Ticket for ${title}, page ${i + 1}` : `Ticket for ${title}`}
-          className={`w-full rounded-[12px] bg-white object-contain ring-1 ring-black/10 ${imgClassName}`}
+          className={`w-full rounded-[12px] bg-white object-contain ring-1 ring-foreground/10 ${imgClassName}`}
         />
       ))}
       {extra > 0 && (

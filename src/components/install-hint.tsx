@@ -58,7 +58,7 @@ export function InstallHint() {
         type="button"
         onClick={dismiss}
         aria-label="Dismiss"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-black/5"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-foreground/5"
       >
         ✕
       </button>

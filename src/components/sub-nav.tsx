@@ -14,7 +14,7 @@ export function SubNav({
   children?: ReactNode;
 }) {
   return (
-    <div className="sticky top-12 z-40 border-b border-black/[0.06] bg-[rgb(251_251_253/0.78)] backdrop-blur-xl backdrop-saturate-150 print:hidden">
+    <div className="sticky top-12 z-40 border-b border-foreground/[0.06] bg-nav backdrop-blur-xl backdrop-saturate-150 print:hidden">
       <div className="mx-auto flex h-12 max-w-[980px] items-center justify-between gap-4 px-4 sm:px-6">
         <Link href={href} className="min-w-0 truncate text-[17px] font-semibold tracking-[-0.02em] sm:text-[19px]">
           {title}

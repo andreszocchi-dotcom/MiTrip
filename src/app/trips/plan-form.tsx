@@ -124,7 +124,7 @@ export function PlanForm({
       </label>
 
       {(hasErrors || state?.error) && (
-        <p role="alert" className="rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-[12px] bg-danger-bg px-4 py-3 text-sm text-danger">
           {state?.error ?? "Almost there. Fix the fields marked in red above."}
         </p>
       )}

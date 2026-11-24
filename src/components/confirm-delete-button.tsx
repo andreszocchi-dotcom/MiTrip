@@ -27,7 +27,7 @@ export function ConfirmDeleteButton({
   }
 
   return (
-    <div role="alertdialog" className="w-full rounded-[22px] bg-[#fdecec] p-5 text-[#7a1a12]">
+    <div role="alertdialog" className="w-full rounded-[22px] bg-danger-bg p-5 text-danger">
       <p className="font-medium">Are you sure?</p>
       <p className="mt-1 text-sm">{warning}</p>
       <div className="mt-4 flex gap-3">

@@ -14,6 +14,38 @@
   --accent-soft: #e8f1fa;
   --ink: #000000;
   --ink-soft: #1d1d1f;
+  --secondary: #e8e8ed;
+  --secondary-hover: #dedee3;
+  --danger-bg: #fdecec;
+  --danger-bg-hover: #fbdede;
+  --danger: #b42318;
+  --nav: rgb(251 251 253 / 0.78);
+  color-scheme: light;
+}
+
+/* Dark mode follows the phone's setting, like Apple's own apps. Pure black
+   page, lifted gray surfaces, softer white text, a brighter blue. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --surface: #1c1c1e;
+    --foreground: #f5f5f7;
+    --muted: #98989d;
+    --line: #3a3a3c;
+    --brand: #5aa3e6;
+    --accent: #4a9ff5;
+    --accent-hover: #6cb2f7;
+    --accent-soft: #10243a;
+    --ink: #1c1c1e;
+    --ink-soft: #2c2c2e;
+    --secondary: #2c2c2e;
+    --secondary-hover: #3a3a3c;
+    --danger-bg: #3a1513;
+    --danger-bg-hover: #4a1b18;
+    --danger: #ff8a80;
+    --nav: rgb(22 22 23 / 0.78);
+    color-scheme: dark;
+  }
 }
 
 @theme inline {
@@ -28,6 +60,9 @@
   --color-accent-soft: var(--accent-soft);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-nav: var(--nav);
   --font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -135,18 +170,18 @@ body {
     background: var(--accent-hover);
   }
   .btn-secondary {
-    background: #e8e8ed;
+    background: var(--secondary);
     color: var(--foreground);
   }
   .btn-secondary:hover {
-    background: #dedee3;
+    background: var(--secondary-hover);
   }
   .btn-danger {
-    background: #fdecec;
-    color: #b42318;
+    background: var(--danger-bg);
+    color: var(--danger);
   }
   .btn-danger:hover {
-    background: #fbdede;
+    background: var(--danger-bg-hover);
   }
 
   /* Text link with a chevron, e.g. "See the full day ›". */
@@ -183,6 +218,24 @@ body {
     box-shadow: 0 0 0 4px rgb(217 45 32 / 0.15);
   }
 
+  /* Trip colors (lib/themes.ts tripScope): an element gets the trip's day
+     and night colors as variables, and --tc-* resolves to the right one, so
+     everything inside can use T.sky, T.ink, T.soft, T.strong. */
+  .t-scope {
+    --tc-sky: var(--t-sky);
+    --tc-ink: var(--t-ink);
+    --tc-soft: var(--t-soft);
+    --tc-strong: var(--t-strong);
+  }
+  @media (prefers-color-scheme: dark) {
+    .t-scope {
+      --tc-sky: var(--t-sky-n);
+      --tc-ink: var(--t-ink-n);
+      --tc-soft: var(--t-soft-n);
+      --tc-strong: var(--t-strong-n);
+    }
+  }
+
   /* Fade and rise into view on scroll (see components/reveal.tsx). */
   .reveal {
     opacity: 0;
@@ -211,6 +264,13 @@ body {
 .scene-pulse { animation: scene-pulse 6s ease-in-out infinite; }
 .scene-glide { animation: scene-glide 14s ease-in-out infinite alternate; }
 .scene-still * { animation: none !important; }
+/* Each scene is drawn twice, by day and by night; show the one for the
+   phone's light or dark mode. */
+.scene-night { display: none; }
+@media (prefers-color-scheme: dark) {
+  .scene-day { display: none; }
+  .scene-night { display: block; }
+}
 
 @keyframes scene-drift { to { transform: translateX(-400px); } }
 @keyframes scene-drift-160 { to { transform: translateX(-480px); } }
@@ -237,8 +297,17 @@ body {
   }
 }
 
-/* Printed pages (Save as PDF) go on plain white paper. */
+/* Printed pages (Save as PDF) go on plain white paper, even in dark mode. */
 @media print {
+  :root {
+    --background: #ffffff;
+    --surface: #ffffff;
+    --foreground: #1d1d1f;
+    --muted: #6e6e73;
+    --line: #d2d2d7;
+    --accent: #2f74b5;
+    color-scheme: light;
+  }
   body {
     background: #ffffff !important;
   }

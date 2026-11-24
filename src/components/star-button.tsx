@@ -39,8 +39,8 @@ export function StarButton({
         onClick={toggle}
         aria-pressed={isStarred}
         aria-label={ariaLabel}
-        className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-xl backdrop-blur transition-colors hover:bg-white ${
-          isStarred ? "text-amber-500" : "text-foreground/50"
+        className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-xl backdrop-blur transition-colors hover:bg-white dark:bg-black/35 dark:hover:bg-black/55 ${
+          isStarred ? "text-amber-500 dark:text-amber-300" : "text-foreground/50"
         }`}
       >
         <span aria-hidden="true">{isStarred ? "★" : "☆"}</span>
@@ -57,10 +57,10 @@ export function StarButton({
       className={
         size === "large"
           ? `flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              isStarred ? "bg-amber-50 text-amber-700" : "bg-black/[0.05] text-muted hover:text-foreground"
+              isStarred ? "bg-amber-50 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300" : "bg-foreground/[0.05] text-muted hover:text-foreground"
             }`
           : `flex w-full items-center justify-center gap-1.5 px-5 py-3 text-sm font-medium ${
-              isStarred ? "text-amber-600" : "text-muted"
+              isStarred ? "text-amber-600 dark:text-amber-300" : "text-muted"
             }`
       }
     >

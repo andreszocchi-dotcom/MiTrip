@@ -63,7 +63,7 @@ export async function People({
       )}
 
       {people.length > 1 || !isOwner ? (
-        <ul className="mt-6 divide-y divide-black/[0.06] border-t border-black/[0.06]">
+        <ul className="mt-6 divide-y divide-foreground/[0.06] border-t border-foreground/[0.06]">
           {people.map((person) => (
             <li key={person.user_id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
@@ -75,7 +75,7 @@ export async function People({
               </div>
               {isOwner && person.role !== "owner" && (
                 <form action={removeMember.bind(null, tripId, person.user_id)}>
-                  <button type="submit" className="text-sm font-medium text-[#b42318] hover:underline">
+                  <button type="submit" className="text-sm font-medium text-danger hover:underline">
                     Remove
                   </button>
                 </form>

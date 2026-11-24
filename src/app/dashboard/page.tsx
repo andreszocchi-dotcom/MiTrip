@@ -6,7 +6,7 @@ import { TripScene } from "@/components/trip-scene";
 import { computeDashboardStats, todayIso } from "@/lib/dashboard-stats";
 import { formatDateRange } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { themeOf } from "@/lib/themes";
+import { T, themeOf, tripScope } from "@/lib/themes";
 
 export const metadata: Metadata = { title: "Dashboard · MiTrip" };
 
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           (next.ongoing ? t.start_date <= today && today <= t.end_date : t.start_date > today),
       )
     : undefined;
-  const nextTheme = themeOf(nextTrip?.theme ?? "ocean");
+  const nextScope = tripScope(themeOf(nextTrip?.theme ?? "ocean"));
 
   return (
     <main className="page !max-w-[980px]">
@@ -64,8 +64,8 @@ export default async function DashboardPage() {
         {nextTrip && next ? (
           <Link
             href={`/trips/${nextTrip.id}`}
-            className="col-span-2 row-span-2 flex flex-col overflow-hidden rounded-[22px] transition-transform active:scale-[0.99]"
-            style={{ backgroundColor: nextTheme.sky, color: nextTheme.ink }}
+            className={`col-span-2 row-span-2 flex flex-col overflow-hidden rounded-[22px] transition-transform active:scale-[0.99] ${nextScope.className}`}
+            style={{ ...nextScope.style, backgroundColor: T.sky, color: T.ink }}
           >
             <div className="p-6 sm:p-8">
               <p className="text-[15px] font-medium opacity-80">{next.ongoing ? "Happening now" : "Next trip"}</p>
