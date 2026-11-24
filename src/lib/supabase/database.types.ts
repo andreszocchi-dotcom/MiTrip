@@ -299,10 +299,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      join_trip: {
-        Args: { p_code: string }
-        Returns: number | null
-      }
+      join_trip: { Args: { p_code: string }; Returns: number }
       trip_people: {
         Args: { p_trip_id: number }
         Returns: {
