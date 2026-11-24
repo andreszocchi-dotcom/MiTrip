@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { Icon, type IconName } from "@/components/icons";
+import { PdfTicketPages } from "@/components/pdf-ticket-pages";
 import { StarButton } from "@/components/star-button";
 import { SubNav } from "@/components/sub-nav";
 import { TicketUpload } from "@/components/ticket-upload";
@@ -139,6 +140,9 @@ export default async function PlanPage({ params }: PageProps<"/trips/[id]/plans/
             <p className="text-[13px] text-muted">Ticket</p>
             {ticket?.signedUrl && ticketIsPdf && (
               <>
+                <div className="mt-3">
+                  <PdfTicketPages url={ticket.signedUrl} title={plan.title} />
+                </div>
                 <a
                   href={ticket.signedUrl}
                   target="_blank"

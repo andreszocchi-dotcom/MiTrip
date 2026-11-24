@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { PdfTicketPages } from "@/components/pdf-ticket-pages";
 import { PrintButton } from "@/components/print-button";
 import { countDays, formatDateRange, formatDay, formatTime } from "@/lib/dates";
 import { googleMapsUrl } from "@/lib/maps";
@@ -81,10 +82,11 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
             <ul className="mt-3 flex flex-col gap-3">
               {day.plans.map((plan) => {
                 const type = planTypeOf(plan.type);
-                // A PDF ticket can't be drawn into the printed page, so it gets a
-                // note (and a link, which works in the saved PDF while online).
+                // Photos print as they are; PDF tickets are drawn into images in
+                // the browser so they print too.
                 const pdfTicket = isPdfTicket(plan.ticket_image);
-                const photo = plan.ticket_image && !pdfTicket ? ticketUrl.get(plan.ticket_image) : undefined;
+                const ticketLink = plan.ticket_image ? ticketUrl.get(plan.ticket_image) : undefined;
+                const photo = pdfTicket ? undefined : ticketLink;
                 return (
                   <li key={plan.id} className="break-inside-avoid rounded-[12px] p-4 ring-1 ring-black/10">
                     <p className="text-sm text-muted">
@@ -127,11 +129,10 @@ export default async function PrintTripPage({ params }: PageProps<"/trips/[id]/p
                       )}
                     </dl>
                     {plan.notes && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{plan.notes}</p>}
-                    {pdfTicket && (
-                      <p className="mt-2 text-sm">
-                        <span className="font-medium">Ticket PDF:</span>{" "}
-                        <span className="text-muted">saved in MiTrip on this plan. Download it before you lose signal.</span>
-                      </p>
+                    {pdfTicket && ticketLink && (
+                      <div className="mt-3 max-w-md">
+                        <PdfTicketPages url={ticketLink} title={plan.title} maxPages={6} imgClassName="print:ring-0" />
+                      </div>
                     )}
                     {photo && (
                       // eslint-disable-next-line @next/next/no-img-element -- private, short-lived signed link
