@@ -22,11 +22,14 @@ async function signUp(client: ReturnType<typeof newClient>, tag: string) {
 
 // PLAN.md section 5, data isolation test.
 describe.skipIf(!url || !key)("data isolation: User B cannot see User A's trip", () => {
-  const userA = newClient();
-  const userB = newClient();
+  // Made in beforeAll, so a run without the test project skips cleanly.
+  let userA: ReturnType<typeof newClient>;
+  let userB: ReturnType<typeof newClient>;
   let tripId: number;
 
   beforeAll(async () => {
+    userA = newClient();
+    userB = newClient();
     // Given User A owns the trip "Australia-NZ Honeymoon" with one plan
     await signUp(userA, "a");
     const { data: trip, error } = await userA
