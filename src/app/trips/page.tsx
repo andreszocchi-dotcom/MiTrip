@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { InstallHint } from "@/components/install-hint";
 import { PageHero } from "@/components/page-hero";
 import { TripCard } from "@/components/trip-card";
 import { todayIso } from "@/lib/dashboard-stats";
@@ -57,6 +58,8 @@ export default async function TripsPage() {
           Add a trip
         </Link>
       </PageHero>
+
+      <InstallHint />
 
       {all.length === 0 && (
         <div className="tile mx-auto w-full max-w-[640px] p-10 text-center">

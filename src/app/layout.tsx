@@ -13,6 +13,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "MiTrip",
   description: "Every plan for your trip, organized by day.",
+  // Opened from the iPhone home screen, MiTrip runs full screen like an app.
+  appleWebApp: {
+    capable: true,
+    title: "MiTrip",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
