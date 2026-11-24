@@ -1,45 +1,94 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Reveal } from "@/components/reveal";
-import { TripScene } from "@/components/trip-scene";
+import { SceneBanner, TripScene } from "@/components/trip-scene";
 import { THEMES } from "@/lib/themes";
 
-// Sample day shown in the phone on the landing page.
+// Sample day shown in the phone on the landing page: a small copy of the
+// real day page (scene header, route panel, timeline).
 const SAMPLE_PLANS = [
   { time: "8:30 AM", icon: "🏨", title: "Breakfast at the hotel", place: "Park Hyatt Sydney" },
-  { time: "10:00 AM", icon: "🎟️", title: "Opera House tour", place: "Bennelong Point" },
-  { time: "1:00 PM", icon: "📍", title: "Coastal walk", place: "Bondi to Coogee" },
+  { time: "10:00 AM", icon: "🎟️", title: "Opera House tour", place: "Sydney Opera House" },
+  { time: "1:00 PM", icon: "📍", title: "Bondi to Coogee walk", place: "Bondi Beach" },
   { time: "7:30 PM", icon: "🍽️", title: "Dinner at Aria", place: "1 Macquarie St" },
 ];
 
 function PhoneMock() {
+  const ocean = THEMES.ocean;
   return (
     <div className="mx-auto w-[300px] rounded-[48px] bg-ink p-3 text-left sm:w-[340px]">
-      <div className="overflow-hidden rounded-[38px] bg-background">
-        <div className="flex justify-center pt-3">
+      <div className="relative h-[600px] overflow-hidden rounded-[38px] bg-background sm:h-[660px]">
+        {/* Status bar island and the trip's sticky bar */}
+        <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-3">
           <div className="h-6 w-24 rounded-full bg-ink" />
         </div>
-        <div className="px-4 pb-6 pt-4">
-          <div className="rounded-[22px] bg-[#e3f0fb] p-4">
-            <p className="text-xs font-semibold text-[#3b82c4]">Day 3 of 14 · Today</p>
-            <p className="mt-0.5 text-xl font-semibold tracking-tight">Sun, Jan 10</p>
-            <p className="mt-1 text-sm">Harbour morning, beach afternoon.</p>
+        <div className="border-b border-black/[0.06] bg-[rgb(251_251_253/0.9)] px-4 pb-2 pt-11">
+          <p className="text-[13px] font-semibold tracking-[-0.01em]">Australia-NZ Honeymoon</p>
+        </div>
+
+        {/* Day header on the scene's sky */}
+        <div style={{ backgroundColor: ocean.sky, color: ocean.ink }}>
+          <div className="px-4 pt-5 text-center">
+            <p className="text-[10px] font-semibold opacity-80">Day 3 · Today</p>
+            <p className="mt-0.5 text-[26px] font-semibold leading-none tracking-[-0.03em]">Sun, Jan 10</p>
+            <p className="mt-1.5 text-[11px] opacity-85">Harbour morning, beach afternoon.</p>
           </div>
-          <div className="mt-3 rounded-full bg-accent py-2 text-center text-xs font-medium text-white">
-            Open the day&apos;s route in Google Maps ↗
+          <SceneBanner theme="ocean" uid="phone-ocean" sky={ocean.sky} className="mt-2 aspect-[2/1]" />
+        </div>
+
+        <div className="px-3 pt-3">
+          {/* Today's route */}
+          <div className="rounded-[18px] bg-ink p-4 text-white">
+            <p className="text-[9px] font-semibold text-white/60">Today&apos;s route</p>
+            <p className="mt-0.5 text-[17px] font-semibold leading-tight tracking-[-0.02em]">
+              4 stops. <span className="text-white/60">One tap.</span>
+            </p>
+            <ol className="mt-2.5 flex flex-col gap-1.5">
+              {SAMPLE_PLANS.map((plan, i) => (
+                <li key={plan.title} className="flex items-center gap-2">
+                  <span
+                    className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-semibold"
+                    style={{ backgroundColor: ocean.sky, color: ocean.ink }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="truncate text-[11px]">{plan.title}</span>
+                </li>
+              ))}
+            </ol>
+            <div className="mt-3 rounded-full bg-white py-1.5 text-center text-[10px] font-medium text-ink">
+              Open in Google Maps
+            </div>
           </div>
-          <ul className="mt-3 flex flex-col gap-2">
+
+          {/* The plan, as a timeline */}
+          <p className="mt-4 text-[17px] font-semibold tracking-[-0.02em]">The plan.</p>
+          <ul className="relative mt-2 flex flex-col gap-2 pl-4">
+            <span aria-hidden="true" className="absolute bottom-0 left-[5px] top-3 w-px" style={{ backgroundColor: ocean.soft }} />
             {SAMPLE_PLANS.map((plan) => (
-              <li key={plan.title} className="flex gap-3 rounded-[18px] bg-surface p-3">
-                <span aria-hidden="true">{plan.icon}</span>
+              <li key={plan.title} className="relative flex gap-2.5 rounded-[14px] bg-surface p-2.5">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[14px] top-4 h-2 w-2 rounded-full ring-2 ring-background"
+                  style={{ backgroundColor: ocean.strong }}
+                />
+                <span aria-hidden="true" className="text-sm">
+                  {plan.icon}
+                </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] text-muted">{plan.time}</p>
-                  <p className="truncate text-sm font-medium">{plan.title}</p>
-                  <p className="truncate text-[11px] text-muted">{plan.place}</p>
+                  <p className="text-[9px] text-muted">{plan.time}</p>
+                  <p className="truncate text-[12px] font-semibold">{plan.title}</p>
+                  <p className="truncate text-[9px] text-muted">{plan.place}</p>
                 </div>
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Fade out at the bottom of the screen, plus the home bar */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute inset-x-0 bottom-2 flex justify-center">
+          <div className="h-1 w-24 rounded-full bg-ink/80" />
         </div>
       </div>
     </div>
