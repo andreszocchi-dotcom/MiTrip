@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ThemeArt } from "@/components/theme-art";
 import { TodayLink } from "@/components/today-link";
 import { countDays, formatDateRange } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
@@ -42,7 +43,7 @@ export default async function TripsPage() {
               <li key={trip.id}>
                 <Link
                   href={`/trips/${trip.id}`}
-                  className="flex min-h-44 flex-col justify-between rounded-[28px] p-7 transition-transform active:scale-[0.99]"
+                  className="relative isolate flex min-h-60 flex-col justify-between overflow-hidden rounded-[28px] p-7 pb-24 transition-transform active:scale-[0.99]"
                   style={{ backgroundColor: theme.soft }}
                 >
                   <p className="text-[28px] font-semibold leading-tight tracking-[-0.02em]" style={{ color: theme.strong }}>
@@ -58,6 +59,7 @@ export default async function TripsPage() {
                   {trip.owner_id !== user.id && (
                     <p className="mt-2 text-sm text-muted">Shared with you</p>
                   )}
+                  <ThemeArt theme={trip.theme} className="absolute bottom-0 right-0 -z-10 h-20 w-full" />
                 </Link>
                 <TodayLink tripId={trip.id} days={trip.days} color={theme.strong} />
               </li>
