@@ -54,8 +54,8 @@ export default async function TripPage({ params }: PageProps<"/trips/[id]">) {
           <h1 className="headline-lg" style={{ color: theme.strong }}>
             {trip.name}
           </h1>
-          <div className="shrink-0 pt-1">
-            <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="large" />
+          <div className="-mr-2 -mt-2 shrink-0 sm:mr-0 sm:mt-0">
+            <StarButton tripId={trip.id} starred={trip.trip_stars.length > 0} size="icon" />
           </div>
         </div>
         <p className="mt-3 text-[19px] text-foreground">
