@@ -6,6 +6,7 @@ import { DayStrip } from "@/components/day-strip";
 import { PlanCard } from "@/components/plan-card";
 import { NextDayLabel, TodayBadge } from "@/components/today-link";
 import { formatDay, formatTime } from "@/lib/dates";
+import { dayRouteLinks, routeStops } from "@/lib/maps";
 import { planTypeOf } from "@/lib/plan-types";
 import { sortPlansByTime } from "@/lib/plan-order";
 import { createClient } from "@/lib/supabase/server";
@@ -64,6 +65,8 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
   const plans = sortPlansByTime(day.plans);
   const theme = themeOf(trip.theme);
   const isOwner = trip.owner_id === user.id;
+  const stops = routeStops(plans);
+  const routeLinks = dayRouteLinks(stops);
   const dayHref = (dId: number) => `/trips/${trip.id}/days/${dId}`;
 
   return (
@@ -100,6 +103,29 @@ export default async function DayPage({ params }: PageProps<"/trips/[id]/days/[d
           </Link>
         )}
       </div>
+
+      {routeLinks.length > 0 && (
+        <div className="mt-3 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-black/5">
+          <p className="text-sm text-muted">
+            {stops.length} stops today, in plan order, starting from where you are.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {routeLinks.map((link, i) => (
+              <a
+                key={link}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-accent px-4 py-2.5 text-center text-sm font-medium text-white"
+              >
+                {routeLinks.length > 1
+                  ? `Day route, part ${i + 1} of ${routeLinks.length} ↗`
+                  : "Open the day's route in Google Maps ↗"}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {plans.length > 0 ? (
         <ul className="mt-3 flex flex-col gap-3">
