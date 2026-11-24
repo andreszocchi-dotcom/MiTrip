@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import { Reveal } from "@/components/reveal";
 import { TripScene } from "@/components/trip-scene";
 import { THEMES } from "@/lib/themes";
@@ -111,8 +112,8 @@ export default function Home() {
       {/* Hero */}
       <section className="bg-surface px-4 pb-20 pt-20 text-center sm:pb-32 sm:pt-32">
         <Reveal>
-          <p className="eyebrow text-brand">MiTrip</p>
-          <h1 className="headline-xl mx-auto mt-3 max-w-[900px]">
+          <Logo className="mx-auto h-14 w-auto sm:h-20" />
+          <h1 className="headline-xl mx-auto mt-8 max-w-[900px]">
             Your whole trip.
             <br />
             One day at a time.
@@ -164,12 +165,12 @@ export default function Home() {
         <Reveal className="mx-auto max-w-[980px] text-center">
           <h2 className="headline-lg">Every trip, its own world.</h2>
           <p className="subhead mx-auto mt-4 max-w-[620px]">
-            Pick a scene for each trip. Waves roll, fog drifts through the pines, and the sun sets over
-            the water.
+            Pick a scene for each trip. Waves roll, fog drifts through the pines, and the city lights up at
+            dusk.
           </p>
         </Reveal>
         <Reveal className="mx-auto mt-14 max-w-[1200px]" delay={120}>
-          <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0">
+          <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-6 lg:overflow-visible lg:px-0">
             {Object.entries(THEMES).map(([key, theme]) => (
               <li
                 key={key}

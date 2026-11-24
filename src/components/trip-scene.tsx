@@ -9,6 +9,19 @@ type SceneProps = { uid: string };
 const W = 800;
 const H = 400;
 
+// A repeatable "random" number in [0, 1) from integer math only, so the
+// server and the browser draw exactly the same trees, buildings, and windows
+// (Math.sin can differ in the last digit between the two).
+function hash(n: number) {
+  let t = (Math.round(n * 1000) + 0x6d2b79f5) | 0;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+// One decimal place is plenty for drawing and keeps markup identical.
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
 // A rolling wave band from y down to the bottom, twice as wide as the canvas
 // (plus one wavelength) so it can drift sideways forever without a seam.
 function wavePath(y: number, amp: number, wavelength: number) {
@@ -45,12 +58,13 @@ function pine(x: number, base: number, h: number) {
 // A ridge of pines on a soft hill. Heights vary in a fixed pattern (no
 // randomness), so the server and browser draw the same trees.
 function forestLayer(baseY: number, hillAmp: number, treeH: number, spacing: number, phase: number) {
-  const hill = (x: number) => baseY - Math.sin((x + phase) / 140) * hillAmp - Math.sin((x + phase) / 53) * hillAmp * 0.3;
+  const hill = (x: number) =>
+    r1(baseY - Math.sin((x + phase) / 140) * hillAmp - Math.sin((x + phase) / 53) * hillAmp * 0.3);
   let d = `M0 ${hill(0)}`;
   for (let x = 0; x <= W; x += 20) d += `L${x} ${hill(x)}`;
   d += `V${H}H0Z`;
   for (let x = -spacing / 2 + (phase % spacing); x < W + spacing; x += spacing) {
-    const h = treeH * (0.7 + 0.3 * Math.abs(Math.sin(x * 12.9898 + phase)));
+    const h = r1(treeH * (0.7 + 0.3 * hash(x + phase)));
     d += pine(x, hill(x) + 6, h);
   }
   return d;
@@ -378,7 +392,135 @@ function Mountain({ uid }: SceneProps) {
   );
 }
 
-const SCENES = { ocean: Ocean, sand: Sand, forest: Forest, sunset: Sunset, mountain: Mountain };
+
+type Building = { x: number; w: number; top: number };
+
+// A row of flat-topped buildings standing on baseY.
+function skyline(baseY: number, minH: number, maxH: number, minW: number, maxW: number, seed: number) {
+  const buildings: Building[] = [];
+  let x = -10;
+  let i = 0;
+  while (x < W + 10) {
+    const w = r1(minW + hash(seed + i) * (maxW - minW));
+    const h = r1(minH + hash(seed + i + 50) * (maxH - minH));
+    buildings.push({ x, w, top: r1(baseY - h) });
+    x = r1(x + w + 2 + hash(seed + i + 99) * 4);
+    i++;
+  }
+  return buildings;
+}
+
+function buildingsPath(buildings: Building[], baseY: number) {
+  return buildings.map((b) => `M${b.x} ${baseY}V${b.top}h${b.w}V${baseY}Z`).join("");
+}
+
+// Lit windows on a row of buildings, split into three groups that twinkle
+// at different moments.
+function windowRects(buildings: Building[], baseY: number, seed: number) {
+  const groups: string[] = ["", "", ""];
+  buildings.forEach((b, bi) => {
+    for (let wx = b.x + 4; wx < b.x + b.w - 5; wx += 8) {
+      for (let wy = b.top + 6; wy < baseY - 8; wy += 11) {
+        const r = hash(seed + bi * 31 + Math.round(wx) * 7 + Math.round(wy) * 13);
+        if (r > 0.58) groups[Math.floor(r * 30) % 3] += `M${wx.toFixed(1)} ${wy.toFixed(1)}h3.5v5h-3.5Z`;
+      }
+    }
+  });
+  return groups;
+}
+
+function City({ uid }: SceneProps) {
+  const id = (n: string) => `${uid}-${n}`;
+  const far = skyline(262, 40, 110, 22, 46, 3);
+  const mid = skyline(292, 50, 150, 26, 58, 17);
+  const near = skyline(330, 40, 130, 34, 70, 41);
+  const [lit1, lit2, lit3] = windowRects(near, 330, 7);
+  const [mlit1, mlit2] = windowRects(mid, 292, 23);
+  return (
+    <>
+      <defs>
+        <linearGradient id={id("sky")} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c3bcee" />
+          <stop offset="0.5" stopColor="#e6d8f3" />
+          <stop offset="0.8" stopColor="#fde3d6" />
+        </linearGradient>
+        <radialGradient id={id("moon")} cx="0.79" cy="0.22" r="0.16">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={id("river")} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#7b70b8" />
+          <stop offset="1" stopColor="#332c66" />
+        </linearGradient>
+      </defs>
+      <rect width={W} height={H} fill={`url(#${id("sky")})`} />
+      <rect width={W} height={H} fill={`url(#${id("moon")})`} />
+      <circle cx="632" cy="86" r="20" fill="#fffaf0" />
+      {/* Stars */}
+      <g fill="#ffffff">
+        <circle cx="120" cy="50" r="1.6" className="scene-shimmer" />
+        <circle cx="260" cy="34" r="1.3" className="scene-shimmer-alt" />
+        <circle cx="420" cy="62" r="1.5" className="scene-shimmer" />
+        <circle cx="520" cy="28" r="1.2" className="scene-shimmer-alt" />
+        <circle cx="730" cy="46" r="1.4" className="scene-shimmer" />
+        <circle cx="60" cy="110" r="1.1" className="scene-shimmer-alt" />
+      </g>
+      {/* A plane crossing, its light blinking */}
+      <g className="scene-glide">
+        <g transform="translate(230 112)">
+          <path d="M0 0 L22 -2 L26 -6 L28 -6 L27 -1 L34 -1 Q37 0 34 1 L27 1 L28 6 L26 6 L22 2 Z" fill="#6f64ad" />
+          <circle cx="2" cy="0" r="1.6" fill="#ff7a6b" className="scene-shimmer" />
+        </g>
+      </g>
+      {/* Far, mid, and near skylines */}
+      <path d={buildingsPath(far, 270)} fill="#d3cbef" />
+      <path d={buildingsPath(mid, 300)} fill="#a397d6" />
+      {/* Landmarks in the middle row: a spire tower and a dome */}
+      <path d="M520 300 V150 h26 V300 Z M526 150 L533 92 L540 150 Z M532 92 V62" fill="#a397d6" stroke="#a397d6" strokeWidth="2" />
+      <path d="M232 300 V214 h64 V300 Z M236 214 a28 28 0 0 1 56 0 Z M264 186 V170" fill="#a397d6" stroke="#a397d6" strokeWidth="2" />
+      <g fill="#fff1c9" opacity="0.7">
+        <path d={mlit1} className="scene-shimmer" />
+        <path d={mlit2} />
+      </g>
+      <path d={buildingsPath(near, 332)} fill="#4c4288" />
+      <g fill="#ffd98a">
+        <path d={lit1} />
+        <path d={lit2} className="scene-shimmer" />
+        <path d={lit3} className="scene-shimmer-alt" />
+      </g>
+      {/* River with the city's lights on the water */}
+      <rect y="330" width={W} height={H - 330} fill={`url(#${id("river")})`} />
+      <g fill="#ffd98a" opacity="0.55">
+        {[60, 150, 270, 380, 470, 590, 690].map((x, i) => (
+          <rect
+            key={x}
+            x={x}
+            y={344 + (i % 3) * 12}
+            width={18 + (i % 4) * 8}
+            height="2.5"
+            rx="1.25"
+            className={i % 2 ? "scene-shimmer" : "scene-shimmer-alt"}
+          />
+        ))}
+      </g>
+      {/* An arched bridge */}
+      <g fill="none" stroke="#2c2560" strokeWidth="5" strokeLinecap="round">
+        <path d="M-10 338 H330" />
+        <path d="M20 338 Q90 296 160 338 Q230 296 300 338" strokeWidth="4" />
+      </g>
+      <g stroke="#2c2560" strokeWidth="2">
+        {[50, 80, 110, 130, 190, 210, 240, 270].map((x) => (
+          <path key={x} d={`M${x} 338 V${x < 160 ? 312 + Math.abs(x - 90) * 0.45 : 312 + Math.abs(x - 230) * 0.45}`} />
+        ))}
+      </g>
+      <g className="scene-drift-slow">
+        <path d={wavePath(372, 3, 200)} fill="#2a2458" opacity="0.6" />
+      </g>
+    </>
+  );
+}
+
+const SCENES = { ocean: Ocean, sand: Sand, forest: Forest, sunset: Sunset, mountain: Mountain, city: City };
 
 export function TripScene({
   theme,

@@ -9,6 +9,7 @@ export const THEMES = {
   forest: { label: "Forest", soft: "#e5f3ea", strong: "#3f8a5a", ink: "#1f5434", sky: "#d3ecdc" },
   sunset: { label: "Sunset", soft: "#fbe9e3", strong: "#c8603f", ink: "#8a3520", sky: "#f7b9a6" },
   mountain: { label: "Mountain", soft: "#ebeef3", strong: "#5b6b82", ink: "#2d3a50", sky: "#c9d6ea" },
+  city: { label: "City", soft: "#eeebf9", strong: "#6a5cb8", ink: "#352c6e", sky: "#c3bcee" },
 } as const;
 
 export type ThemeName = keyof typeof THEMES;

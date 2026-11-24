@@ -76,7 +76,7 @@ export function TripForm({
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">Scene</legend>
         <p className="text-sm text-muted">Sets the trip&apos;s color and the picture on its pages.</p>
-        <div className="mt-2 grid grid-cols-3 gap-2.5 sm:grid-cols-5">
+        <div className="mt-2 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
           {Object.entries(THEMES).map(([value, theme]) => (
             <label key={value} className="cursor-pointer">
               <input
